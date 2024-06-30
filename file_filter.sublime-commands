@@ -1,0 +1,30 @@
+[
+    {
+        "caption": "vsc : Filter File ",
+        "command": "file_filter",
+        "args": {
+            "command_name": "command_filter"
+        }
+    },
+    {
+        "caption": "vsc : Filter File : Folding Style",
+        "command": "file_filter",
+        "args": {
+            "command_name": "command_set_folding_type"
+        }
+    },
+    {
+        "caption": "vsc : Filter File : Highlight Style",
+        "command": "file_filter",
+        "args": {
+            "command_name": "command_set_highlight_type"
+        }
+    },
+    {
+        "caption": "vsc : Filter File : Done. Clear all!",
+        "command": "file_filter",
+        "args": {
+            "command_name": "command_clear"
+        }
+    }
+]
