@@ -1,6 +1,6 @@
 [
     {
-        "caption": "vsc : Filter File ",
+        "caption": "vsc : Filter File",
         "command": "file_filter",
         "args": {
             "command_name": "command_filter"
