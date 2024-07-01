@@ -21,7 +21,7 @@
         }
     },
     {
-        "caption": "vsc : Filter File : Done. Clear all!",
+        "caption": "vsc : Filter File : Clear",
         "command": "file_filter",
         "args": {
             "command_name": "command_clear"

@@ -40,12 +40,23 @@ class HighlightTypes(Enum):
 
         return obj
    
-class FileFilterConstants(Enum):
-
-    SETTINGS_REGEX = 'regex'
-    QUICK_PANEL_OPTIONS = 'saved_regex_list'
+class SettingView(Enum):
+    
+    CURRENT_REGEX = 'vsc_file_filter_current_regex'
     STATUS_BAR_REGEX = 'vsc_file_filter_status_bar_regex'
     HIGHLIGHTED_REGIONS = 'logs_file_lines_highlights'
+
+class SettingFiles(Enum):
+
+    FILE_NAME_INTERNAL_SETTINGS = 'settings-internal-file-filter.sublime-settings'
+    FILE_NAME_EXTERNAL_SETTINGS = 'settings-internal-file-filter.sublime-settings'
+    
+    OPTION_REGEX_LIST = 'regex_list'
+
+class ReservedRegexListOptions(Enum):
+
+    PROMPT = "___prompt___"
+    CLEAR = "___clear___"
 
 class FileFilterCommand(sublime_plugin.WindowCommand):
 
@@ -62,14 +73,18 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
         self.log_state(command_name)
         
         self.view = self.window.active_view()
-        self.settings = sublime.load_settings('file_filter.sublime-settings')
+        self.FILE_NAME_INTERNAL_SETTINGS = sublime.load_settings(SettingFiles.FILE_NAME_INTERNAL_SETTINGS.value)
+        self.FILE_NAME_EXTERNAL_SETTINGS = sublime.load_settings(SettingFiles.FILE_NAME_EXTERNAL_SETTINGS.value)
 
-        self.quick_panel_options = self.settings.get(FileFilterConstants.QUICK_PANEL_OPTIONS.value, [])
+        self.regex_options_list = ( self.FILE_NAME_INTERNAL_SETTINGS.get(SettingFiles.OPTION_REGEX_LIST.value, []) 
+                                        + self.FILE_NAME_EXTERNAL_SETTINGS.get(SettingFiles.OPTION_REGEX_LIST.value, [])
+                                )   
+
 
         if command_name == "command_filter":
             self.input_quick_panel = self.window.show_quick_panel(
-                self.quick_panel_options
-                , on_select= lambda idx :self.command_filter(None if idx < 0 else self.quick_panel_options[idx][1]) 
+                self.regex_options_list
+                , on_select= lambda idx :self.command_filter(None if idx < 0 else self.regex_options_list[idx][1]) 
             )
             return
 
@@ -92,9 +107,9 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
             return
 
     def command_filter(self, regex):
-        self.log_state(regex)
+        self.log_state((regex, ReservedRegexListOptions.PROMPT.value))
 
-        if regex == "___prompt___":
+        if regex == ReservedRegexListOptions.PROMPT.value:
             self.input_panel =  self.window.show_input_panel(
                 "Enter  regex:"
                 , self.regex or ""
@@ -103,6 +118,10 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
                 , None #self.on_cancel
             )
             self.input_panel.set_syntax_file("Packages/Text/Plain text.tmLanguage")
+            return
+
+        if regex == ReservedRegexListOptions.CLEAR.value:
+            self.clear()
             return
         
         self.set_regex(regex)
@@ -133,11 +152,11 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
         self.log_state(regex)
 
         if not regex:
-            self.view.settings().erase(FileFilterConstantis.SETTINGS_REGEX.value)
+            self.view.settings().erase(SettingView.CURRENT_REGEX.value)
             self.clear()
             return
         else:
-            self.view.settings().set(FileFilterConstantis.SETTINGS_REGEX.value, regex)
+            self.view.settings().set(SettingView.CURRENT_REGEX.value, regex)
             self.regex = regex
 
         if hasattr(self, 'input_panel') and self.input_panel is not None:
@@ -162,7 +181,7 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
             return
 
         self.clear()
-        self.view.set_status(key=FileFilterConstants.STATUS_BAR_REGEX.value, value="Filter: /" + self.regex +"/")
+        self.view.set_status(key=SettingView.STATUS_BAR_REGEX.value, value="Filter: /" + self.regex +"/")
 
         view_size = self.view.size()
 
@@ -181,7 +200,7 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
 
             ft = self.folding_type
             for outter_region, inner_region in zip(matches_regions_full, matches_regions):
-                print(ft,FoldingTypes.match_only,FoldingTypes.before_only)
+
                 if ft == FoldingTypes.match_only or ft == FoldingTypes.before_only:
                     self.view.fold(sublime.Region(outter_region.begin(), inner_region.begin()))
 
@@ -190,7 +209,7 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
     
             if self.highlight_type != HighlightTypes.none:
                 self.view.add_regions(
-                    FileFilterConstants.HIGHLIGHTED_REGIONS.value  # Key for the highlighted regions
+                    SettingView.HIGHLIGHTED_REGIONS.value  # Key for the highlighted regions
                     , matches_regions  # List of regions to highlight
                     , 'highlight'  # Scope name (use a predefined or custom scope)
                     , ''  # No icon
@@ -201,8 +220,8 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
         self.log_state()
 
         self.view.unfold(sublime.Region(0, self.view.size()))
-        self.view.erase_regions(FileFilterConstants.HIGHLIGHTED_REGIONS.value)
-        self.view.set_status(key=FileFilterConstants.STATUS_BAR_REGEX.value, value="")
+        self.view.erase_regions(SettingView.HIGHLIGHTED_REGIONS.value)
+        self.view.set_status(key=SettingView.STATUS_BAR_REGEX.value, value="")
 
     def log(self, message):
         return
