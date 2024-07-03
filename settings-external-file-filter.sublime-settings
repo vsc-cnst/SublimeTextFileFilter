@@ -1,8 +1,8 @@
 {
     "regex_list": [
-        ["batch : [Step]", "\\[Step\\].*(?=\\{)"],
+        ["batch : [Step]", "\\[Step\\][^\\{]*(?=\\{)"],
         ["batch : [Step] IdProcesso", "\\[Step\\].*IdProcesso\\(.*(?=\\{)"],
         ["batch : Starting w/ Date Time", "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\["],
-        ["web : SOAP Request : HH", "(?s)<\\?xml version=\"1.0\" encoding=\"utf-16\"\\?>.*?<\/s:Envelope>"],
+        ["web : SOAP Request : HH", "(?s)<\\?xml.*?</s:Envelope>"],
     ]
 }

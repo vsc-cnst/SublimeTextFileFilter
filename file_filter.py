@@ -13,6 +13,12 @@ import re
 import inspect
 
 from enum import Enum
+
+import time
+
+
+DEBUG = False
+LOG_TIME = True
     
 class FoldingTypes(Enum):
 
@@ -42,14 +48,19 @@ class HighlightTypes(Enum):
    
 class SettingView(Enum):
     
+    FILTER_ACTIVE = 'vsc_file_filter_is_active'
+
     CURRENT_REGEX = 'vsc_file_filter_current_regex'
+    CURRENT_FOLDING_TYPE = 'vsc_file_filter_current_folding_type'
+    CURRENT_HIGHLIGHT_TYPE = 'vsc_file_filter_current_highlight_type'
+
     STATUS_BAR_REGEX = 'vsc_file_filter_status_bar_regex'
-    HIGHLIGHTED_REGIONS = 'logs_file_lines_highlights'
+    HIGHLIGHTED_REGIONS = 'vsc_file_filter_highlighted_regions'
 
 class SettingFiles(Enum):
 
     FILE_NAME_INTERNAL_SETTINGS = 'settings-internal-file-filter.sublime-settings'
-    FILE_NAME_EXTERNAL_SETTINGS = 'settings-internal-file-filter.sublime-settings'
+    FILE_NAME_EXTERNAL_SETTINGS = 'settings-external-file-filter.sublime-settings'
     
     OPTION_REGEX_LIST = 'regex_list'
 
@@ -58,64 +69,45 @@ class ReservedRegexListOptions(Enum):
     PROMPT = "___prompt___"
     CLEAR = "___clear___"
 
-class FileFilterCommand(sublime_plugin.WindowCommand):
+class FileFilter(sublime_plugin.WindowCommand):
 
-    def __init__(self, window):
+    def __init__(self, window, DEBUG=DEBUG):
 
         super().__init__(window)
 
+        self.DEBUG = DEBUG;
+        
         self.regex = None
         self.folding_type = FoldingTypes.line
         self.highlight_type = HighlightTypes.solid
-
-
-    def run(self, command_name="command_filter"):
-        self.log_state(command_name)
         
+        self.internal_settings = sublime.load_settings(SettingFiles.FILE_NAME_INTERNAL_SETTINGS.value)
+        self.external_settings = sublime.load_settings(SettingFiles.FILE_NAME_EXTERNAL_SETTINGS.value)
+
+        self.regex_options_list = ( 
+            self.internal_settings.get(SettingFiles.OPTION_REGEX_LIST.value, []) 
+            + self.external_settings.get(SettingFiles.OPTION_REGEX_LIST.value, [])
+        )   
+
+
+    def run(self, DEBUG=DEBUG):
         self.view = self.window.active_view()
-        self.FILE_NAME_INTERNAL_SETTINGS = sublime.load_settings(SettingFiles.FILE_NAME_INTERNAL_SETTINGS.value)
-        self.FILE_NAME_EXTERNAL_SETTINGS = sublime.load_settings(SettingFiles.FILE_NAME_EXTERNAL_SETTINGS.value)
+        self.load_regex_from_settings()
+        self.load_folding_type_from_settings()
+        self.load_highlight_type_from_settings()
 
-        self.regex_options_list = ( self.FILE_NAME_INTERNAL_SETTINGS.get(SettingFiles.OPTION_REGEX_LIST.value, []) 
-                                        + self.FILE_NAME_EXTERNAL_SETTINGS.get(SettingFiles.OPTION_REGEX_LIST.value, [])
-                                )   
-
-
-        if command_name == "command_filter":
-            self.input_quick_panel = self.window.show_quick_panel(
-                self.regex_options_list
-                , on_select= lambda idx :self.command_filter(None if idx < 0 else self.regex_options_list[idx][1]) 
-            )
-            return
-
-        if command_name == "command_set_folding_type":
-            self.input_quick_panel = self.window.show_quick_panel(
-                [ft.value for ft in FoldingTypes]
-                , on_select = lambda idx : self.command_set_folding_type(self.folding_type if idx < 0 else [ft for ft in FoldingTypes][idx])
-            )
-            return
-
-        if command_name == "command_set_highlight_type":
-            self.input_quick_panel = self.window.show_quick_panel(
-                [ht.description for ht in HighlightTypes]
-                , on_select = lambda idx : self.command_set_highlight_type(self.highlight_type if idx < 0 else [ft for ft in HighlightTypes][idx])
-            )
-            return
-
-        if command_name == "command_clear":
-            self.clear()
-            return
 
     def command_filter(self, regex):
         self.log_state((regex, ReservedRegexListOptions.PROMPT.value))
-
+        
         if regex == ReservedRegexListOptions.PROMPT.value:
+
             self.input_panel =  self.window.show_input_panel(
                 "Enter  regex:"
                 , self.regex or ""
-                , self.set_regex
-                , None #self.on_change
-                , None #self.on_cancel
+                , self.command_filter
+                , None # self.on_change
+                , None  # self.on_cancel
             )
             self.input_panel.set_syntax_file("Packages/Text/Plain text.tmLanguage")
             return
@@ -125,35 +117,44 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
             return
         
         self.set_regex(regex)
+        self.apply()
+
+    def load_folding_type_from_settings(self):
+        self.folding_type = FoldingTypes[self.view.settings().get(SettingView.CURRENT_FOLDING_TYPE.value, FoldingTypes.line.name)]
 
     def command_set_folding_type(self, folding_type):
         self.log_state(folding_type.value)
 
-        if not folding_type:
-            return
-        if folding_type not in [ft for ft in FoldingTypes]:
+        if not folding_type or folding_type not in [ft for ft in FoldingTypes]:
+            self.view.settings().set(SettingView.CURRENT_FOLDING_TYPE.value, FoldingTypes.line.name)
             return
 
+        self.view.settings().set(SettingView.CURRENT_FOLDING_TYPE.value, folding_type.name)
         self.folding_type = folding_type
         self.apply()
+
+    def load_highlight_type_from_settings(self):
+        self.highlight_type = HighlightTypes[self.view.settings().get(SettingView.CURRENT_HIGHLIGHT_TYPE.value, HighlightTypes.solid.name)]
 
     def command_set_highlight_type(self, highlight_type):
         self.log_state(highlight_type.value)
         
-        if not highlight_type:
-            return
-        if highlight_type not in [ht for ht in HighlightTypes]:
+        if not highlight_type or highlight_type not in [ht for ht in HighlightTypes]:
+            self.view.settings().erase(SettingView.CURRENT_HIGHLIGHT_TYPE.value)
             return
 
+        self.view.settings().set(SettingView.CURRENT_HIGHLIGHT_TYPE.value, highlight_type.name)
         self.highlight_type = highlight_type
         self.apply()
+
+    def load_regex_from_settings(self):
+        self.regex = self.view.settings().get(SettingView.CURRENT_REGEX.value, "")
 
     def set_regex(self, regex = ""):
         self.log_state(regex)
 
         if not regex:
             self.view.settings().erase(SettingView.CURRENT_REGEX.value)
-            self.clear()
             return
         else:
             self.view.settings().set(SettingView.CURRENT_REGEX.value, regex)
@@ -162,9 +163,93 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
         if hasattr(self, 'input_panel') and self.input_panel is not None:
             self.input_panel.close()
 
-        self.apply()
-
     def apply(self):
+        self.log_state()
+        
+        if not self.regex:
+            return
+
+        self.clear()
+
+        start_time = time.time()
+
+        view_size = self.view.size()
+
+        matches_regions = self.view.find_all(self.regex)
+        total_matches_regions = len(matches_regions)
+
+        status = {
+            'Folding': self.folding_type.value,
+            'Highlight': self.highlight_type.description,
+            'Filter': "/" + str(self.regex) +"/",
+            'Total Matches': total_matches_regions,
+        }
+        
+        self.view.set_status(key=SettingView.STATUS_BAR_REGEX.value, value= str(status))
+
+        if self.folding_type is not FoldingTypes.highlight_only and total_matches_regions > 0:
+
+            self.log_state()
+
+            temp_fold_regions = [sublime.Region(0, 0)] + matches_regions + [sublime.Region(view_size, view_size)]
+            fold_regions = [ sublime.Region(prev.end(), curr.begin()) for prev, curr in zip(temp_fold_regions, temp_fold_regions[1:])]
+            
+
+            first_fold = fold_regions[0]
+            last_fold = fold_regions[-1]
+            
+            # fold lines with no match
+            for fold in fold_regions:
+
+                if fold.size() <= 0 or fold.begin() >= fold.end():
+                    continue
+
+                if fold is first_fold or fold is last_fold:
+                    self.view.fold(fold)
+                    continue
+
+                a = self.view.full_line(fold.begin())
+                b = self.view.full_line(fold.end())
+
+                if a == b:
+                    self.view.fold(fold)
+                    continue
+
+                first = None
+                middle = None
+
+                if self.folding_type == FoldingTypes.match_only:
+                    first = (fold.begin(), b.begin() - 1) 
+                    middle = (0,0)
+                else:
+                    first = (fold.begin(), a.end()-1)
+                    middle = (a.end() , b.begin()) 
+
+                last = (b.begin(), fold.end())
+
+                if  first[0] < first[1] and self.folding_type in [FoldingTypes.match_only, FoldingTypes.after_only]:
+                    self.view.fold(sublime.Region(*first))
+
+                if middle[0] < middle[1]:
+                    self.view.fold(sublime.Region(*middle))
+
+                if last[0] < last[1] and self.folding_type in [FoldingTypes.match_only, FoldingTypes.before_only]:
+                    self.view.fold(sublime.Region(*last))
+
+
+        if LOG_TIME:
+            print("--- %s seconds ---" % (time.time() - start_time))
+
+        if len(matches_regions) > 0 and self.highlight_type != HighlightTypes.none:
+            self.view.add_regions(
+                SettingView.HIGHLIGHTED_REGIONS.value  # Key for the highlighted regions
+                , matches_regions  # List of regions to highlight
+                , 'highlight'  # Scope name (use a predefined or custom scope)
+                , ''  # No icon
+                , self.highlight_type.value
+            )
+
+    def apply_old(self):
         self.log_state()
         
         #algorithm explained example
@@ -181,11 +266,15 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
             return
 
         self.clear()
+
+        self.view.settings().set(SettingView.CURRENT_REGEX.value, True)
+        
         self.view.set_status(key=SettingView.STATUS_BAR_REGEX.value, value="Filter: /" + self.regex +"/")
 
         view_size = self.view.size()
 
         matches_regions = self.view.find_all(self.regex)
+
         match_lines = [self.view.lines(r) for r in matches_regions]
         matches_regions_full = [sublime.Region(lines[0].begin(), view_size if  lines[-1].end() == view_size else lines[-1].end() + 1) for lines in match_lines]
         
@@ -224,7 +313,10 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
         self.view.set_status(key=SettingView.STATUS_BAR_REGEX.value, value="")
 
     def log(self, message):
-        return
+        
+        if(not self.DEBUG):
+            return
+
         # Get the current frame
         frame = inspect.currentframe()
         # Get the caller's frame
@@ -235,7 +327,10 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
         print('[FileFilterCommand][' + caller_name +']', message)
 
     def log_state(self, args = None):
-        return
+        
+        if(not self.DEBUG):
+            return
+
         # Get the current frame
         frame = inspect.currentframe()
         # Get the caller's frame
@@ -253,3 +348,49 @@ class FileFilterCommand(sublime_plugin.WindowCommand):
 
         exp = '\n\t'.join([ key + ': ' + str(value) for key, value in dic.items()])
         print('[FileFilterCommand][' + caller_name +']', exp)
+
+
+class FileFilterCommand(FileFilter):
+
+    def run(self):
+        self.log_state()
+
+        super().run()
+    
+        self.window.show_quick_panel(
+            self.regex_options_list
+            , on_select= lambda idx :self.command_filter(None if idx < 0 else self.regex_options_list[idx][1]) 
+        )
+
+class FileFilterSetFoldingTypeCommand(FileFilter):
+
+    def run(self):
+        self.log_state()
+
+        super().run()
+    
+        self.window.show_quick_panel(
+            [ft.value for ft in FoldingTypes]
+            , on_select = lambda idx : self.command_set_folding_type(self.folding_type if idx < 0 else [ft for ft in FoldingTypes][idx])
+        )
+
+class FileFilterSetHighlightTypeCommand(FileFilter):
+
+    def run(self):
+        self.log_state()
+        
+        super().run()
+    
+        self.window.show_quick_panel(
+            [ht.description for ht in HighlightTypes]
+            , on_select = lambda idx : self.command_set_highlight_type(self.highlight_type if idx < 0 else [ft for ft in HighlightTypes][idx])
+        )
+
+class FileFilterClearCommand(FileFilter):
+
+    def run(self):
+        self.log_state()
+        
+        super().run()
+    
+        self.clear()
