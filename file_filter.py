@@ -204,9 +204,9 @@ class FileFilter(sublime_plugin.WindowCommand):
                 if fold.size() <= 0 or fold.begin() >= fold.end():
                     continue
 
-                if fold is first_fold or fold is last_fold:
-                    self.view.fold(fold)
-                    continue
+                # if fold is first_fold or fold is last_fold:
+                #     self.view.fold(fold)
+                #     continue
 
                 a = self.view.full_line(fold.begin())
                 b = self.view.full_line(fold.end())
@@ -227,13 +227,13 @@ class FileFilter(sublime_plugin.WindowCommand):
 
                 last = (b.begin(), fold.end())
 
-                if  first[0] < first[1] and self.folding_type in [FoldingTypes.match_only, FoldingTypes.after_only]:
+                if first[0] < first[1] and (self.folding_type in [FoldingTypes.match_only, FoldingTypes.after_only] or fold is first_fold ):
                     self.view.fold(sublime.Region(*first))
 
                 if middle[0] < middle[1]:
                     self.view.fold(sublime.Region(*middle))
 
-                if last[0] < last[1] and self.folding_type in [FoldingTypes.match_only, FoldingTypes.before_only]:
+                if last[0] < last[1] and (self.folding_type in [FoldingTypes.match_only, FoldingTypes.before_only] or fold is last_fold):
                     self.view.fold(sublime.Region(*last))
 
 

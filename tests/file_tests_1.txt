@@ -1,0 +1,20 @@
+2024-07-02 12:27:15 [INF]
+2024-07-02 12:27:15 [INF]
+2024-07-02 12:27:15 [INF]
+2024-07-02 12:27:15 [INF]
+2024-07-02 12:27:15 [INF]
+2024-07-02 12:27:15 [INF] [Step][CancelamentoProcessoConfirmacaoStep] Entrou 1 {}
+2024-07-02 12:27:15 [INF] 
+2024-07-02 12:27:15 [INF] 
+[Step][CancelamentoProcessoConfirmacaoStep] Entrou 2 {}2024-07-02 12:27:15 [INF] 
+2024-07-02 12:27:15 [INF] 
+2024-07-02 12:27:15 [INF] 
+2024-07-02 12:27:15 [INF] 
+2024-07-02 12:27:15 [INF] 
+2024-07-02 12:27:15 [INF] 
+2024-07-02 12:27:15 [INF] 
+2024-07-02 12:27:15 [INF] 
+2024-07-02 12:27:15 [INF] 
+2024-07-02 12:27:15 [INF] [Step][CancelamentoProcessoConfirmacaoStep] Entrou 3 {} 2024-07-02 12:27:15 [INF] 2024-07-02 12:27:15 [Step][CancelamentoProcessoConfirmacaoStep] Entrou 3 {}{} 
+2024-07-02 12:27:15 [INF] [Step][CancelamentoProcessoConfirmacaoStep] Entrou 3 {} 
+ 
