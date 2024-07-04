@@ -1,11 +1,5 @@
 import sys
 import os
-pkg_folder = os.path.dirname(__file__)
-enum_folder = os.path.join(pkg_folder, "enum")
-
-
-if pkg_folder not in sys.path:
-    sys.path.append(pkg_folder)
 
 import sublime
 import sublime_plugin
@@ -109,7 +103,7 @@ class FileFilter(sublime_plugin.WindowCommand):
                 , None # self.on_change
                 , None  # self.on_cancel
             )
-            self.input_panel.set_syntax_file("Packages/Text/Plain text.tmLanguage")
+            # self.input_panel.set_syntax_file("Packages/Text/Plain text.tmLanguage")
             return
 
         if regex == ReservedRegexListOptions.CLEAR.value:
