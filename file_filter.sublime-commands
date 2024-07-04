@@ -1,30 +1,18 @@
 [
     {
         "caption": "vsc : Filter File",
-        "command": "file_filter",
-        "args": {
-            "command_name": "command_filter"
-        }
+        "command": "file_filter"
     },
     {
         "caption": "vsc : Filter File : Folding Style",
-        "command": "file_filter",
-        "args": {
-            "command_name": "command_set_folding_type"
-        }
+        "command": "file_filter_set_folding_type"
     },
     {
         "caption": "vsc : Filter File : Highlight Style",
-        "command": "file_filter",
-        "args": {
-            "command_name": "command_set_highlight_type"
-        }
+        "command": "file_filter_set_highlight_type"
     },
     {
         "caption": "vsc : Filter File : Clear",
-        "command": "file_filter",
-        "args": {
-            "command_name": "command_clear"
-        }
+        "command": "file_filter_clear"
     }
 ]
