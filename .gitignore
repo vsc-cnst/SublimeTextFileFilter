@@ -4,7 +4,7 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 # my
-*__.sublime-settings
+_*.*
 
 # User-specific files
 *.rsuser

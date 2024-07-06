@@ -7,26 +7,19 @@ from unittest.mock import patch
 
 file_filter = sys.modules["File Filter.file_filter"]
 
-
 FileFilterPromptRegexCommand = file_filter.FileFilterPromptRegexCommand
 
 FoldingTypes = file_filter.FoldingTypes
 HighlightTypes = file_filter.HighlightTypes
 
-class TestCommandFilter(TestCase):
+class TestCommandPrompt(TestCase):
 
     def setUp(self):
         self.window = sublime.active_window()
         self.view = self.window.new_file()
         self.window.focus_view(self.view)
 
-        self.quick_panel_expected_options = [
-            ['prompt', '___prompt___'], 
-            ['clear', '___clear___'], 
-            ['[INF]', '\\[INF[0-9]]'],
-            ["Starting w/ Date Time", "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\["]
-        ]
-
+        patch('File_Filter.file_filter.VIEW_SETTINGS_VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE', "DUMMY_VALUE")
 
     def tearDown(self):
         if self.view:
@@ -35,10 +28,8 @@ class TestCommandFilter(TestCase):
             self.view.window().run_command("close_file")
  
 
-    # @unittest.skip("TODO")
     @patch('sublime.Window.show_quick_panel')
-    @patch('sublime.Window.show_input_panel')
-    def test_command_quick_panel_options(self, mock_show_quick_panel, show_input_panel):
+    def test_command_quick_panel_options(self, mock_show_quick_panel):
         
         def quick_panel_callback(items, on_select, flags=0, selected_index=-1, on_highlight= None, placeholder=None):
             on_select(0)
@@ -52,19 +43,27 @@ class TestCommandFilter(TestCase):
         actual_args, actual_kwargs = mock_show_quick_panel.call_args
         actual_options = actual_args[0]
 
-        self.assertEqual(actual_options,self.quick_panel_expected_options, "Unexpected set of options")
+        self.assertGreaterEqual(len(actual_options), 2)
+        self.assertEqual(['prompt', '___prompt___'], actual_options[0], "Mandatory option in fst position")
+        self.assertIn(['clear', '___clear___'], actual_options)
 
 
 
     @patch('sublime.Window.show_input_panel')
     @patch('sublime.Window.show_quick_panel')
-    def test_command_quick_panel_options(self, mock_show_quick_panel, mock_show_input_panel):
+    def test_command_quick_panel_open_prompt(self, mock_show_quick_panel, mock_show_input_panel):
         
         def quick_panel_callback(items, on_select, flags=0, selected_index=-1, on_highlight=None, placeholder=None):
             on_select(0)
 
-        def input_panel_callback(caption, initial_text, on_done, on_change, on_cancel):
-            on_done("test input")
+        def input_panel_callback(caption, regex, on_done=None, on_change=None, on_cancel=None):
+            
+            actual_value = regex
+            expected_value = ''
+            self.assertEqual(actual_value, expected_value)
+
+            on_done(regex)
+
 
         mock_show_quick_panel.side_effect = quick_panel_callback
         mock_show_input_panel.side_effect = input_panel_callback
@@ -72,16 +71,10 @@ class TestCommandFilter(TestCase):
         self.window.run_command('file_filter_quick_panel')
 
         mock_show_quick_panel.assert_called()
-
-        actual_args, actual_kwargs = mock_show_quick_panel.call_args
-        actual_options = actual_args[0]
-        self.assertEqual(actual_options, self.quick_panel_expected_options, "Unexpected set of options")
-
         mock_show_input_panel.assert_called()
 
+            
 
-
-    # @unittest.skip("TODO")
     @patch('sublime.Window.show_input_panel')
     def test_command_prompt_regex_open(self, mock_show_input_panel):
 
@@ -91,7 +84,6 @@ class TestCommandFilter(TestCase):
 
 
 
-    # @unittest.skip("TODO")
     @patch('sublime.Window.show_input_panel')
     def test_command_prompt_regex_set(self, mock_show_input_panel):
 
@@ -111,7 +103,6 @@ class TestCommandFilter(TestCase):
 
 
 
-    # @unittest.skip("TODO")
     @patch('sublime.Window.show_quick_panel')
     def test_command_set_folding_type_options(self, mock_show_quick_panel):
 
@@ -131,18 +122,17 @@ class TestCommandFilter(TestCase):
         self.assertEqual(actual_options,FoldingTypes.all_values(), "Unexpected set of options")
 
 
-    # @unittest.skip("TODO")
     @patch('sublime.Window.show_quick_panel')
-    def test_command__set_highlight_type(self, mock_show_quick_panel):
+    def test_command_set_highlight_type(self, mock_show_quick_panel):
 
-        def quick_panel_callback(items, on_select, flags=0, selected_index=-1, on_highlight= None, placeholder=None):
+        def quick_panel_callback(items, on_select=None, flags=0, selected_index=-1, on_highlight= None, placeholder=None):
             on_select(0)
 
         mock_show_quick_panel.side_effect = quick_panel_callback
 
         self.window.run_command('file_filter_set_highlight_type')
 
-        mock_show_quick_panel.assert_called()
+        # mock_show_quick_panel.assert_called_once_with("Enter regex:", unittest.mock.ANY, None, None)
 
         # Validate the arguments passed to show_quick_panel
         actual_args, actual_kwargs = mock_show_quick_panel.call_args

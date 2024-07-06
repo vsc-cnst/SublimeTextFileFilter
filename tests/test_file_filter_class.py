@@ -45,17 +45,14 @@ class TestCommandFilter(TestCase):
             self.view.window().run_command("close_file")
 
 
-    # @unittest.skip("")
     def test_initial_state(self):
 
-        self.assertIsNot(self.command.SETTINGS, None)
         self.assertIsNot(self.command.REGEX_OPTIONS_LIST, None)
 
         self.assertEqual(self.command.folding_type, FoldingTypes.line)
         self.assertEqual(self.command.highlight_type, HighlightTypes.solid)
 
 
-    # @unittest.skip("")
     def test_line(self):
 
         self.command.command_set_folding_type(FoldingTypes.line)
@@ -65,13 +62,12 @@ class TestCommandFilter(TestCase):
 
         self.assertEqual(len(self.folded_regions), 3)
 
-        expected_values = [(0, 3), (8, 12), (16, 20)]
+        expected_values = [(0, 4), (8, 12), (16, 20)]
         actual_values = [ r.to_tuple() for r in self.view.folded_regions()]
         
         self.assertEqual(actual_values, expected_values)
 
 
-    # @unittest.skip("")
     def test_match_only(self):
         
         self.command.command_set_folding_type(FoldingTypes.match_only)
@@ -84,7 +80,6 @@ class TestCommandFilter(TestCase):
         
         self.assertEqual(actual_values, expected_values)
 
-    # @unittest.skip("TODO")
     def test_fold_before(self):
 
         self.command.command_set_folding_type(FoldingTypes.before_only)

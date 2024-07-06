@@ -20,7 +20,11 @@
         "command": "file_filter_clear"
     },
     {
-        "caption": "File Filter : Open Settings",
-        "command": ""
-    }
+        "caption": "File Filter : Edit Settings",
+        "command": "edit_settings",
+        "args": {
+          "base_file": "${packages}/File Filter/file_filter.sublime-settings"
+        }
+
+    },
 ]
