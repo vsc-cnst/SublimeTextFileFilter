@@ -1,0 +1,7 @@
+[
+  {
+    "keys": ["escape"],  // Replace with your desired key binding
+    "command": "file_filter_clear",
+    "context": [{ "key": "file_filter.view_settings.is_filter_active", "operator": "equal", "operand": true }]
+  }
+]

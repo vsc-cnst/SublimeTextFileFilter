@@ -71,6 +71,7 @@ SETTING_FILE_SETTINGS_PROP_REGEX_LIST = 'regex_list'
 
     
 # keys for view.settings 
+VIEW_SETTINGS_IS_FILTER_ACTIVE = 'file_filter.view_settings.is_filter_active'
 VIEW_SETTINGS_CURRENT_REGEX = 'file_filter.view_settings.current_regex'
 VIEW_SETTINGS_CURRENT_FOLDING_TYPE = 'file_filter.view_settings.current_folding_type'
 VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE = 'file_filter.view_settings.current_highlight_type'
@@ -211,6 +212,8 @@ class FileFilter(sublime_plugin.WindowCommand):
             return
 
         self.clear()
+
+        self.view.settings().set(VIEW_SETTINGS_IS_FILTER_ACTIVE, True)
 
         view_size = self.view.size()
 
@@ -398,4 +401,15 @@ class FileFilterClearCommand(FileFilter):
     def run(self):
         super().run()
 
+        self.view.settings().erase(VIEW_SETTINGS_IS_FILTER_ACTIVE)
         self.clear()
+
+
+class FileFilterListener(sublime_plugin.EventListener):
+
+    def on_query_context(self, view, key, operator, operand, match_all):
+        if key == VIEW_SETTINGS_IS_FILTER_ACTIVE:
+            is_file_filter_active = view.settings().get(VIEW_SETTINGS_IS_FILTER_ACTIVE, False)
+            LOGGER.debug(f"[FileFilterListener]{VIEW_SETTINGS_IS_FILTER_ACTIVE} -> {is_file_filter_active }")
+            return is_file_filter_active
+        return None
