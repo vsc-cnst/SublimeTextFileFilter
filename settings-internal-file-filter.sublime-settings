@@ -1,6 +1,0 @@
-{
-    "regex_list": [
-        ["prompt", "___prompt___"],
-        ["clear", "___clear___"],
-    ]
-}

@@ -1,18 +1,26 @@
 [
     {
-        "caption": "vsc : Filter File",
-        "command": "file_filter"
+        "caption": "File Filter",
+        "command": "file_filter_prompt_regex"
     },
     {
-        "caption": "vsc : Filter File : Folding Style",
+        "caption": "File Filter : Quick Panel",
+        "command": "file_filter_quick_panel"
+    },
+    {
+        "caption": "File Filter : Folding Style",
         "command": "file_filter_set_folding_type"
     },
     {
-        "caption": "vsc : Filter File : Highlight Style",
+        "caption": "File Filter : Highlight Style",
         "command": "file_filter_set_highlight_type"
     },
     {
-        "caption": "vsc : Filter File : Clear",
+        "caption": "File Filter : Clear",
         "command": "file_filter_clear"
+    },
+    {
+        "caption": "File Filter : Open Settings",
+        "command": ""
     }
 ]
