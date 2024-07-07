@@ -12,7 +12,7 @@ on:
         type: boolean
 jobs:
   run_tests:
-    uses: "./.github/workflows/run_tests.yml"
+    uses: ./.github/workflows/run_tests.yml
     # Adjust the path if your test workflow is located elsewhere
 
   create_release:

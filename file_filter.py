@@ -1,8 +1,10 @@
+import sys
+import re
+
+import logging
 import sublime
 import sublime_plugin
-import re
-import logging
-import time
+
 from enum import Enum
 
 class MyEnum(Enum):
@@ -61,6 +63,19 @@ class ReservedRegexListOptions(TupleEnum):
     PROMPT = "prompt", "___prompt___"
     CLEAR = "clear", "___clear___"
 
+
+##
+## LOGGING  
+##
+
+# setting logging
+LOGGING_LEVEL = logging.INFO
+LOGGING_FORMAT = f"[%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
+
+logging.basicConfig(level=LOGGING_LEVEL, format=LOGGING_FORMAT)
+LOGGER = logging.getLogger(f'root_logger')
+
+
 ##
 ## SETTINGS  
 ##
@@ -79,23 +94,14 @@ VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE = 'file_filter.view_settings.current_highli
 
 VIEW_SETTINGS_STATUS_BAR_REGEX = 'file_filter.view_settings.status_bar_regex'
 VIEW_SETTINGS_HIGHLIGHTED_REGIONS = 'file_filter.view_settings.highlighted_regions'
-
-# setting logging
-LOGGING_LEVEL = logging.ERROR
-LOGGING_FORMAT = f"[%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
-
     
-
-##
-## LOGGING  
-##
-
-logging.basicConfig(level=LOGGING_LEVEL, format=LOGGING_FORMAT)
-LOGGGER = logging.getLogger(f'root_logger')
-
 
 SETTING_OBSERVER_KEY = "cc362837-008e-4a24-8bc2-b32c8d455c21"
 SETTINGS = None
+
+
+
+
 
 ##
 ## PLUGIN
@@ -104,10 +110,10 @@ SETTINGS = None
 def plugin_loaded() -> None:
     global SETTINGS
     SETTINGS = sublime.load_settings(SETTING_FILE_SETTINGS_NAME)
-    LOGGGER.debug(f"plugin loaded with settings {SETTINGS}")
+    LOGGER.info(f"plugin loaded with settings {SETTINGS}")
 
 def plugin_unloaded() -> None:
-    LOGGGER.debug("plugin unloaded")
+    LOGGER.info("plugin unloaded")
 
 
 class FileFilter(sublime_plugin.WindowCommand):
@@ -116,7 +122,7 @@ class FileFilter(sublime_plugin.WindowCommand):
 
         super().__init__(window)
         self.log = logging.getLogger(self.__class__.__name__)
-        
+
         self.REGEX_OPTIONS_LIST = ReservedRegexListOptions.all_members()
 
         self.regex = None
@@ -127,10 +133,12 @@ class FileFilter(sublime_plugin.WindowCommand):
         
         SETTINGS.add_on_change(SETTING_OBSERVER_KEY, self.on_settings_change)
 
-        self.log.debug("Command is Started")
+        self.log.info("Command Has Started")
 
 
     def run(self):
+        self.log.info("entered")
+
         self.view = self.window.active_view()
 
         view_settings = self.view.settings()
