@@ -1,8 +1,10 @@
+import sys
+import re
+
+import logging
 import sublime
 import sublime_plugin
-import re
-import logging
-import time
+
 from enum import Enum
 
 class MyEnum(Enum):
@@ -66,8 +68,17 @@ class ReservedRegexListOptions(TupleEnum):
 ## LOGGING  
 ##
 
+# setting logging
+LOGGING_LEVEL = logging.ERROR
+LOGGING_FORMAT = f"[--%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
+
 logging.basicConfig(level=LOGGING_LEVEL, format=LOGGING_FORMAT)
-LOGGGER = logging.getLogger(f'root_logger')
+# logging_stdout_handler = logging.StreamHandler(sys.stdout)
+
+
+# LOGGGER = logging.getLogger(f'root_logger')
+# LOGGGER.addHandler(logging_stdout_handler)
+
 
 ##
 ## SETTINGS  
@@ -87,17 +98,14 @@ VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE = 'file_filter.view_settings.current_highli
 
 VIEW_SETTINGS_STATUS_BAR_REGEX = 'file_filter.view_settings.status_bar_regex'
 VIEW_SETTINGS_HIGHLIGHTED_REGIONS = 'file_filter.view_settings.highlighted_regions'
-
-# setting logging
-LOGGING_LEVEL = logging.ERROR
-LOGGING_FORMAT = f"[--%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
-
     
-
-
 
 SETTING_OBSERVER_KEY = "cc362837-008e-4a24-8bc2-b32c8d455c21"
 SETTINGS = None
+
+
+
+
 
 ##
 ## PLUGIN
@@ -118,7 +126,8 @@ class FileFilter(sublime_plugin.WindowCommand):
 
         super().__init__(window)
         self.log = logging.getLogger(self.__class__.__name__)
-        
+        # self.log.addHandler(logging.StreamHandler(sys.stdout))
+
         self.REGEX_OPTIONS_LIST = ReservedRegexListOptions.all_members()
 
         self.regex = None
