@@ -24,6 +24,9 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@2
+        with:
+          python-version: 3.8
       - uses: SublimeText/UnitTesting/actions/setup@v1
         with:
           package-name: "${{ matrix.package-name }}"
