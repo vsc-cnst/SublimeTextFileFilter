@@ -26,8 +26,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: SublimeText/UnitTesting/actions/setup@v1
         with:
-          package-name: Package Name   # if differs from repo name
-          sublime-text-version: "${{ matrix.package-name }}"
+          package-name: "${{ matrix.package-name }}"
+          sublime-text-version: ${{ matrix.st-version }}
       - uses: SublimeText/UnitTesting/actions/run-tests@v1
         with:
           coverage: false
