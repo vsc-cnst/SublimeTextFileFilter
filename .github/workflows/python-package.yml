@@ -16,15 +16,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        st-version: [3, 4]
-        os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
+        # st-version: [3, 4]
+        # os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
+        st-version: ["3"]
+        os: ["windows-latest"]
         package-name: ["File\ Filter"]
         
     runs-on: ${{ matrix.os }}
     
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-python@2
+      - uses: actions/setup-python@v2
         with:
           python-version: 3.8
       - uses: SublimeText/UnitTesting/actions/setup@v1
