@@ -1,0 +1,35 @@
+# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
+
+name: Teste File Filter package
+
+on:
+  push:
+    branches: [ "main, git-hub-actions" ]
+  pull_request:
+    branches: [ "main" ]
+  
+jobs:
+
+  run-tests:
+  
+    strategy:
+      fail-fast: false
+      matrix:
+        st-version: [3, 4]
+        os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
+        package-name: ["File Filter"]
+        
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      - uses: SublimeText/UnitTesting/actions/setup@v1
+        with:
+          package-name: Package Name   # if differs from repo name
+          sublime-text-version: ${{ matrix.package-name }}
+      - uses: SublimeText/UnitTesting/actions/run-tests@v1
+        with:
+          coverage: false
+          package-name: ${{ matrix.package-name }}
+      - uses: codecov/codecov-action@v4
