@@ -1,0 +1,44 @@
+name: Release ST File Filter package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'version'
+        required: true
+      tags:
+        description: 'Tags'
+        required: false
+        type: boolean
+jobs:
+  run_tests:
+    uses: ./.github/workflows/run_tests.yml
+    # Adjust the path if your test workflow is located elsewhere
+
+  create_release:
+    runs-on: windows-latest
+    needs: run_tests
+    
+    steps:
+      - uses: actions/checkout@v4
+      - run: zip -r "File Filter.sublime-package" . -x ".github/**/*" "tests/**/*" ".gitignore" "unittesting.json"
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: $VERSION
+          release_name: $VERSION
+          draft: false
+          prerelease: false
+
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./"File Filter.sublime-package"
+          asset_name: "File Filter.sublime-package"
+          asset_content_type: application/zip
