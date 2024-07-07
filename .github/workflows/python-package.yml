@@ -27,9 +27,9 @@ jobs:
       - uses: SublimeText/UnitTesting/actions/setup@v1
         with:
           package-name: Package Name   # if differs from repo name
-          sublime-text-version: ${{ matrix.package-name }}
+          sublime-text-version: "${{ matrix.package-name }}"
       - uses: SublimeText/UnitTesting/actions/run-tests@v1
         with:
           coverage: false
-          package-name: ${{ matrix.package-name }}
+          package-name: "${{ matrix.package-name }}"
       - uses: codecov/codecov-action@v4
