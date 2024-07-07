@@ -18,7 +18,7 @@ jobs:
       matrix:
         st-version: [3, 4]
         os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
-        package-name: ["File Filter"]
+        package-name: ["File\ Filter"]
         
     runs-on: ${{ matrix.os }}
     
