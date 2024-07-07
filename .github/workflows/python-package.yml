@@ -5,7 +5,7 @@ name: Teste File Filter package
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "git-actions" ]
   pull_request:
     branches: [ "main" ]
   
@@ -16,20 +16,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        st-version: [3, 4]
-        os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
-        package-name: ["File Filter"]
+        # st-version: [3, 4]
+        # os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
+        st-version: ["3"]
+        os: ["windows-latest"]
+        package-name: ["File\ Filter"]
         
     runs-on: ${{ matrix.os }}
     
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
       - uses: SublimeText/UnitTesting/actions/setup@v1
         with:
-          package-name: Package Name   # if differs from repo name
-          sublime-text-version: ${{ matrix.package-name }}
+          package-name: "${{ matrix.package-name }}"
+          sublime-text-version: ${{ matrix.st-version }}
       - uses: SublimeText/UnitTesting/actions/run-tests@v1
         with:
           coverage: false
-          package-name: ${{ matrix.package-name }}
+          package-name: "${{ matrix.package-name }}"
       - uses: codecov/codecov-action@v4
