@@ -17,9 +17,8 @@ jobs:
       fail-fast: false
       matrix:
         package-name: ["File\ Filter"]     
-        st-version: [3, 4]
-        # os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
-        os: ["windows-latest"]
+        st-version: [4]
+        os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
         
     runs-on: ${{ matrix.os }}
     

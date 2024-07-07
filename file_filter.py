@@ -69,15 +69,11 @@ class ReservedRegexListOptions(TupleEnum):
 ##
 
 # setting logging
-LOGGING_LEVEL = logging.ERROR
-LOGGING_FORMAT = f"[--%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
+LOGGING_LEVEL = logging.INFO
+LOGGING_FORMAT = f"[%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
 
 logging.basicConfig(level=LOGGING_LEVEL, format=LOGGING_FORMAT)
-# logging_stdout_handler = logging.StreamHandler(sys.stdout)
-
-
-# LOGGGER = logging.getLogger(f'root_logger')
-# LOGGGER.addHandler(logging_stdout_handler)
+LOGGER = logging.getLogger(f'root_logger')
 
 
 ##
@@ -114,10 +110,10 @@ SETTINGS = None
 def plugin_loaded() -> None:
     global SETTINGS
     SETTINGS = sublime.load_settings(SETTING_FILE_SETTINGS_NAME)
-    LOGGGER.debug(f"plugin loaded with settings {SETTINGS}")
+    LOGGER.info(f"plugin loaded with settings {SETTINGS}")
 
 def plugin_unloaded() -> None:
-    LOGGGER.debug("plugin unloaded")
+    LOGGER.info("plugin unloaded")
 
 
 class FileFilter(sublime_plugin.WindowCommand):
@@ -126,7 +122,6 @@ class FileFilter(sublime_plugin.WindowCommand):
 
         super().__init__(window)
         self.log = logging.getLogger(self.__class__.__name__)
-        # self.log.addHandler(logging.StreamHandler(sys.stdout))
 
         self.REGEX_OPTIONS_LIST = ReservedRegexListOptions.all_members()
 
@@ -138,10 +133,12 @@ class FileFilter(sublime_plugin.WindowCommand):
         
         SETTINGS.add_on_change(SETTING_OBSERVER_KEY, self.on_settings_change)
 
-        self.log.debug("Command Has Started")
+        self.log.info("Command Has Started")
 
 
     def run(self):
+        self.log.info("entered")
+
         self.view = self.window.active_view()
 
         view_settings = self.view.settings()
@@ -421,6 +418,6 @@ class FileFilterListener(sublime_plugin.EventListener):
     def on_query_context(self, view, key, operator, operand, match_all):
         if key == VIEW_SETTINGS_IS_FILTER_ACTIVE:
             is_file_filter_active = view.settings().get(VIEW_SETTINGS_IS_FILTER_ACTIVE, False)
-            LOGGE.Rdebug(f"[FileFilterListener]{VIEW_SETTINGS_IS_FILTER_ACTIVE} -> {is_file_filter_active }")
+            LOGGER.debug(f"[FileFilterListener]{VIEW_SETTINGS_IS_FILTER_ACTIVE} -> {is_file_filter_active }")
             return is_file_filter_active
         return None

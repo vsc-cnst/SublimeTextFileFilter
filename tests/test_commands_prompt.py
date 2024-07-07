@@ -13,13 +13,12 @@ FoldingTypes = file_filter.FoldingTypes
 HighlightTypes = file_filter.HighlightTypes
 
 class TestCommandPrompt(TestCase):
-
+        
     def setUp(self): 
         self.window = sublime.active_window()
         self.view = self.window.new_file()
         self.window.focus_view(self.view)
 
-        patch('File_Filter.file_filter.VIEW_SETTINGS_VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE', "DUMMY_VALUE")
 
     def tearDown(self):
         if self.view:
