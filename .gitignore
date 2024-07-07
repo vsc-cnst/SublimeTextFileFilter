@@ -5,6 +5,8 @@
 
 # my
 _*.*
+*.sublime-project
+*.sublime-workspace
 
 # User-specific files
 *.rsuser

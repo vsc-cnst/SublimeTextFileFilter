@@ -61,6 +61,14 @@ class ReservedRegexListOptions(TupleEnum):
     PROMPT = "prompt", "___prompt___"
     CLEAR = "clear", "___clear___"
 
+
+##
+## LOGGING  
+##
+
+logging.basicConfig(level=LOGGING_LEVEL, format=LOGGING_FORMAT)
+LOGGGER = logging.getLogger(f'root_logger')
+
 ##
 ## SETTINGS  
 ##
@@ -82,16 +90,10 @@ VIEW_SETTINGS_HIGHLIGHTED_REGIONS = 'file_filter.view_settings.highlighted_regio
 
 # setting logging
 LOGGING_LEVEL = logging.ERROR
-LOGGING_FORMAT = "[%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
+LOGGING_FORMAT = f"[--%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
 
     
 
-##
-## LOGGING  
-##
-
-logging.basicConfig(level=LOGGING_LEVEL, format=LOGGING_FORMAT)
-LOGGGER = logging.getLogger('root_logger')
 
 
 SETTING_OBSERVER_KEY = "cc362837-008e-4a24-8bc2-b32c8d455c21"
@@ -127,7 +129,7 @@ class FileFilter(sublime_plugin.WindowCommand):
         
         SETTINGS.add_on_change(SETTING_OBSERVER_KEY, self.on_settings_change)
 
-        self.log.debug("Command is Started")
+        self.log.debug("Command Has Started")
 
 
     def run(self):
@@ -410,6 +412,6 @@ class FileFilterListener(sublime_plugin.EventListener):
     def on_query_context(self, view, key, operator, operand, match_all):
         if key == VIEW_SETTINGS_IS_FILTER_ACTIVE:
             is_file_filter_active = view.settings().get(VIEW_SETTINGS_IS_FILTER_ACTIVE, False)
-            LOGGER.debug(f"[FileFilterListener]{VIEW_SETTINGS_IS_FILTER_ACTIVE} -> {is_file_filter_active }")
+            LOGGE.Rdebug(f"[FileFilterListener]{VIEW_SETTINGS_IS_FILTER_ACTIVE} -> {is_file_filter_active }")
             return is_file_filter_active
         return None

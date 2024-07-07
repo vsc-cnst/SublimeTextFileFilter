@@ -1,0 +1,5 @@
+{
+  "verbosity": 2,
+  "coverage": true,
+  "capture_console": true
+}
