@@ -14,12 +14,7 @@ HighlightTypes = file_filter.HighlightTypes
 
 class TestCommandPrompt(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        sys_version = sys.version_info.major * 10 + sys.version_info.minor # 38 '3.8'
-        self.assertGreaterEqual(sys_version, 38)
-
-    def setUp(self):
+    def setUp(self): 
         self.window = sublime.active_window()
         self.view = self.window.new_file()
         self.window.focus_view(self.view)
@@ -33,30 +28,9 @@ class TestCommandPrompt(TestCase):
             self.view.window().run_command("close_file")
  
 
-    @patch('sublime.Window.show_quick_panel')
-    def test_command_quick_panel_options(self, mock_show_quick_panel):
-        
-        def quick_panel_callback(items, on_select, flags=0, selected_index=-1, on_highlight= None, placeholder=None):
-            on_select(0)
-
-        mock_show_quick_panel.side_effect = quick_panel_callback
-
-        self.window.run_command('file_filter_quick_panel')
-
-        mock_show_quick_panel.assert_called()
-
-        actual_args, actual_kwargs = mock_show_quick_panel.call_args
-        actual_options = actual_args[0]
-
-        self.assertGreaterEqual(len(actual_options), 2)
-        self.assertEqual(['prompt', '___prompt___'], actual_options[0], "Mandatory option in fst position")
-        self.assertIn(['clear', '___clear___'], actual_options)
-
-
-
     @patch('sublime.Window.show_input_panel')
     @patch('sublime.Window.show_quick_panel')
-    def test_command_quick_panel_open_prompt(self, mock_show_quick_panel, mock_show_input_panel):
+    def test_command_quick_panel(self, mock_show_quick_panel, mock_show_input_panel):
         
         def quick_panel_callback(items, on_select, flags=0, selected_index=-1, on_highlight=None, placeholder=None):
             on_select(0)
@@ -69,17 +43,25 @@ class TestCommandPrompt(TestCase):
 
             on_done(regex)
 
-
         mock_show_quick_panel.side_effect = quick_panel_callback
         mock_show_input_panel.side_effect = input_panel_callback
 
+        #run
         self.window.run_command('file_filter_quick_panel')
 
         mock_show_quick_panel.assert_called()
         mock_show_input_panel.assert_called()
 
-            
+        # quick pannel
+        actual_args, actual_kwargs = mock_show_quick_panel.call_args
+        actual_options = actual_args[0]
 
+        self.assertGreaterEqual(len(actual_options), 2)
+        self.assertEqual(['prompt', '___prompt___'], actual_options[0], "Mandatory option in fst position")
+        self.assertIn(['clear', '___clear___'], actual_options)
+
+
+            
     @patch('sublime.Window.show_input_panel')
     def test_command_prompt_regex_open(self, mock_show_input_panel):
 
@@ -137,7 +119,7 @@ class TestCommandPrompt(TestCase):
 
         self.window.run_command('file_filter_set_highlight_type')
 
-        # mock_show_quick_panel.assert_called_once_with("Enter regex:", unittest.mock.ANY, None, None)
+        mock_show_quick_panel.assert_called_once_with(HighlightTypes.all_descriptions(), on_select=unittest.mock.ANY)
 
         # Validate the arguments passed to show_quick_panel
         actual_args, actual_kwargs = mock_show_quick_panel.call_args

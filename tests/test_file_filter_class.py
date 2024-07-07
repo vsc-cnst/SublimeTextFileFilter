@@ -16,11 +16,6 @@ HighlightTypes = file_filter.HighlightTypes
 
 class TestCommandFilter(TestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        sys_version = sys.version_info.major * 10 + sys.version_info.minor # 38 '3.8'
-        self.assertGreaterEqual(sys_version, 38)
-
     def setUp(self):
         self.window = sublime.active_window()
         self.view = self.window .new_file()

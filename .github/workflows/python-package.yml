@@ -16,10 +16,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # st-version: [3, 4]
-        # os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
-        st-version: ["3"]
-        os: ["windows-latest"]
+        st-version: [3, 4]
+        os: ["ubuntu-latest", "macOS-latest", "windows-latest"]
         package-name: ["File\ Filter"]
         
     runs-on: ${{ matrix.os }}

@@ -82,7 +82,7 @@ VIEW_SETTINGS_HIGHLIGHTED_REGIONS = 'file_filter.view_settings.highlighted_regio
 
 # setting logging
 LOGGING_LEVEL = logging.ERROR
-LOGGING_FORMAT = f"[%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
+LOGGING_FORMAT = "[%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
 
     
 
@@ -91,7 +91,7 @@ LOGGING_FORMAT = f"[%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno
 ##
 
 logging.basicConfig(level=LOGGING_LEVEL, format=LOGGING_FORMAT)
-LOGGGER = logging.getLogger(f'root_logger')
+LOGGGER = logging.getLogger('root_logger')
 
 
 SETTING_OBSERVER_KEY = "cc362837-008e-4a24-8bc2-b32c8d455c21"
