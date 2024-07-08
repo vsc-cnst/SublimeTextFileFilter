@@ -71,7 +71,8 @@ class ReservedRegexListOptions(TupleEnum):
 
 # setting logging
 LOGGING_LEVEL = logging.ERROR
-LOGGING_FORMAT = f"[%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
+# LOGGING_LEVEL = logging.DEBUG
+LOGGING_FORMAT = f"[%(levelname)3s][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
 
 
 _handler = logging.StreamHandler()
@@ -129,7 +130,8 @@ class FileFilter(sublime_plugin.WindowCommand):
 
         super().__init__(window)
         
-        self.log = logging.getLogger(self.__class__.__name__)
+        self.log = logging.getLogger(f"FileFilter.{self.__class__.__name__}")
+
         self.log.setLevel(LOGGING_LEVEL)
         self.log.addHandler(_handler)
 

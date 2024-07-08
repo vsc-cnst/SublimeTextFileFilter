@@ -30,12 +30,14 @@ class TestCommandPrompt(TestCase):
         
         self.assertEqual(LOGGING_LEVEL, logging.ERROR, "Loggin Level must be ERROR")
 
-        arr = [logging.getLogger(name).level for name in logging.root.manager.loggerDict if name.startswith("FileFilter")] 
-        
-        self.assertEqual(len(arr),6) # has 6 loggers
-        self.assertEqual(arr, 6 * [logging.ERROR]) # all loggers have logging level ERROR
-        
+        existing_loggers = logging.root.manager.loggerDict
 
-        # arr_names = [logging.getLogger(name).name for name in logging.root.manager.loggerDict] 
+        self.assertEqual(len(existing_loggers), 9)
+
+        arr = [logging.getLogger(name).level for name in existing_loggers if name.startswith("FileFilter")] 
+
+        self.assertEqual(arr, 7 * [logging.ERROR]) # all loggers have logging level ERROR
+
+        # arr_names = [logging.getLogger(name).name for name in existing_loggers] 
         # self.assertEqual(arr_names,[]) # has 6 loggers
         
