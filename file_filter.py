@@ -64,16 +64,23 @@ class ReservedRegexListOptions(TupleEnum):
     CLEAR = "clear", "___clear___"
 
 
+
 ##
 ## LOGGING  
 ##
 
 # setting logging
-LOGGING_LEVEL = logging.INFO
+LOGGING_LEVEL = logging.ERROR
 LOGGING_FORMAT = f"[%(levelname)3s][FileFilter][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
 
-logging.basicConfig(level=LOGGING_LEVEL, format=LOGGING_FORMAT)
-LOGGER = logging.getLogger(f'root_logger')
+
+_handler = logging.StreamHandler()
+_formatter = logging.Formatter(LOGGING_FORMAT)
+_handler.setFormatter(_formatter)
+LOGGER = logging.getLogger('FileFilter')
+LOGGER.setLevel(LOGGING_LEVEL)
+LOGGER.addHandler(_handler)
+
 
 
 ##
@@ -95,17 +102,17 @@ VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE = 'file_filter.view_settings.current_highli
 VIEW_SETTINGS_STATUS_BAR_REGEX = 'file_filter.view_settings.status_bar_regex'
 VIEW_SETTINGS_HIGHLIGHTED_REGIONS = 'file_filter.view_settings.highlighted_regions'
     
+KEY_MAP_CONTEXT_KEY_CLEAR = "file_filter.keymaps_context.clear"
 
 SETTING_OBSERVER_KEY = "cc362837-008e-4a24-8bc2-b32c8d455c21"
 SETTINGS = None
 
 
 
-
-
 ##
 ## PLUGIN
 ##
+
 
 def plugin_loaded() -> None:
     global SETTINGS
@@ -121,7 +128,10 @@ class FileFilter(sublime_plugin.WindowCommand):
     def __init__(self, window):
 
         super().__init__(window)
+        
         self.log = logging.getLogger(self.__class__.__name__)
+        self.log.setLevel(LOGGING_LEVEL)
+        self.log.addHandler(_handler)
 
         self.REGEX_OPTIONS_LIST = ReservedRegexListOptions.all_members()
 
@@ -157,9 +167,9 @@ class FileFilter(sublime_plugin.WindowCommand):
         self.regex_prompt_input_panel =  self.window.show_input_panel(
             "Enter regex:"
             , regex or self.regex or ""
-            , on_input_done
-            , None # self.on_change
-            , None  # self.on_cancel
+            , on_input_done # on_done
+            , None # on_change
+            , None  # on_cancel
         )
 
     def command_quick_panel(self, regex):
@@ -416,8 +426,8 @@ class FileFilterClearCommand(FileFilter):
 class FileFilterListener(sublime_plugin.EventListener):
 
     def on_query_context(self, view, key, operator, operand, match_all):
-        if key == VIEW_SETTINGS_IS_FILTER_ACTIVE:
+        if key == KEY_MAP_CONTEXT_KEY_CLEAR:
             is_file_filter_active = view.settings().get(VIEW_SETTINGS_IS_FILTER_ACTIVE, False)
-            LOGGER.debug(f"[FileFilterListener]{VIEW_SETTINGS_IS_FILTER_ACTIVE} -> {is_file_filter_active }")
+            LOGGER.debug(f"key: '{KEY_MAP_CONTEXT_KEY_CLEAR}, returning '{VIEW_SETTINGS_IS_FILTER_ACTIVE} -> {is_file_filter_active }")
             return is_file_filter_active
         return None
