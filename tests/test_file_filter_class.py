@@ -62,7 +62,7 @@ class TestCommandFilter(TestCase):
 
         self.assertEqual(len(self.folded_regions), 3)
 
-        expected_values = [(0, 4), (8, 12), (16, 20)]
+        expected_values = [(0, 3), (7, 11), (15, 19)]
         actual_values = [ r.to_tuple() for r in self.view.folded_regions()]
         
         self.assertEqual(actual_values, expected_values)
