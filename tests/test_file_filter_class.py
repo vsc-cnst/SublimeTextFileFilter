@@ -21,12 +21,9 @@ class TestCommandFilter(TestCase):
         self.view = self.window .new_file()
         self.window.focus_view(self.view)
 
-        current_package_path = os.path.dirname(__file__)
 
-        self.file1 = open(os.path.join(current_package_path, 'fixtures', "example_text_case_1.txt")).read()
-        # self.file2 = open(os.path.join(current_package_path, "example_text_case_2.txt")).read()
 
-        self.view.run_command("insert", {"characters": self.file1})
+        self.view.run_command("insert", {"characters": self.file})
         self.vie_size = self.view.size()
 
         self.regex = r"[0-9]"
@@ -36,7 +33,14 @@ class TestCommandFilter(TestCase):
         self.command.run()
         self.command.set_regex(self.regex)
         self.command.apply()
-        
+  
+
+class TestCommandFilter_File1(TestCommandFilter):     
+
+    @classmethod
+    def setUpClass(cls):
+        current_package_path = os.path.dirname(__file__)
+        cls.file = open(os.path.join(current_package_path, 'fixtures', "example_text_case_1.txt")).read()
 
     def tearDown(self):
         if self.view:
@@ -101,4 +105,26 @@ class TestCommandFilter(TestCase):
         expected_values = [(0, 3) , (6, 11), (14, 19), (24, 25)]
         actual_values = [ r.to_tuple() for r in self.view.folded_regions()]
 
+        self.assertEqual(actual_values, expected_values)
+
+
+class TestCommandFilter_File2(TestCommandFilter):
+
+
+    @classmethod
+    def setUpClass(cls):
+        current_package_path = os.path.dirname(__file__)
+        cls.file = open(os.path.join(current_package_path, 'fixtures', "example_text_case_2.txt")).read()
+
+
+    def test_line(self):
+
+        self.command.command_set_folding_type(FoldingTypes.line)
+        self.assertEqual(self.command.folding_type, FoldingTypes.line)
+        
+        self.folded_regions = self.view.folded_regions()
+
+        expected_values = [(0, 7), (11, 15), (19, 23), (30, 34)]
+        actual_values = [ r.to_tuple() for r in self.view.folded_regions()]
+        
         self.assertEqual(actual_values, expected_values)

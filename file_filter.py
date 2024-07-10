@@ -304,9 +304,10 @@ class FileFilter(sublime_plugin.WindowCommand):
                 elif self.folding_type is FoldingTypes.line:
 
                     if fold is first_fold:
-                        self.fold_span([first], remove_last_char=True)
+                        self.fold_span([first, middle], remove_last_char=True)
+                    if fold is last_fold and a!=b:
+                        self.fold_span([middle, last])
                     elif a != b:
-
                         middle.a = middle.a - 1
                         self.fold_span([middle], remove_last_char=True)
 
