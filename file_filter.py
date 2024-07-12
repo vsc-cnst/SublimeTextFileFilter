@@ -74,15 +74,14 @@ LOGGING_LEVEL = logging.ERROR
 # LOGGING_LEVEL = logging.DEBUG
 LOGGING_FORMAT = f"[%(levelname)3s][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" 
 
-
-_handler = logging.StreamHandler()
-_formatter = logging.Formatter(LOGGING_FORMAT)
-_handler.setFormatter(_formatter)
 LOGGER = logging.getLogger('FileFilter')
 LOGGER.setLevel(LOGGING_LEVEL)
-LOGGER.addHandler(_handler)
 
-
+if not LOGGER.handlers:
+    STREAM_HANDLER = logging.StreamHandler()
+    _formatter = logging.Formatter(LOGGING_FORMAT)
+    STREAM_HANDLER.setFormatter(_formatter)
+    LOGGER.addHandler(STREAM_HANDLER)
 
 ##
 ## SETTINGS  
@@ -121,6 +120,8 @@ def plugin_loaded() -> None:
     LOGGER.info(f"plugin loaded with settings {SETTINGS}")
 
 def plugin_unloaded() -> None:
+    for handler in LOGGER.handlers[:]:
+        STREAM_HANDLER.close()
     LOGGER.info("plugin unloaded")
 
 
@@ -133,7 +134,9 @@ class FileFilter(sublime_plugin.WindowCommand):
         self.log = logging.getLogger(f"FileFilter.{self.__class__.__name__}")
 
         self.log.setLevel(LOGGING_LEVEL)
-        self.log.addHandler(_handler)
+        if not LOGGER.handlers:
+            self.log.addHandler(STREAM_HANDLER)
+        
 
         self.REGEX_OPTIONS_LIST = ReservedRegexListOptions.all_members()
 
