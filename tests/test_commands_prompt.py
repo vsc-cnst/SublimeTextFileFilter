@@ -55,11 +55,11 @@ class TestCommandPrompt(TestCase):
         actual_args, actual_kwargs = mock_show_quick_panel.call_args
         actual_options = actual_args[0]
 
-        self.assertGreaterEqual(len(actual_options), 2)
+        self.assertGreaterEqual(len(actual_options), 4)
         self.assertEqual(['prompt', '___prompt___'], actual_options[0], "Mandatory option in fst position")
         self.assertIn(['clear', '___clear___'], actual_options)
-
-
+        # self.assertIn(["[INF]", "\\[INF]"], actual_options)
+        # self.assertIn(["Starting w/ Date Time", "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\["], actual_options)
             
     @patch('sublime.Window.show_input_panel')
     def test_command_prompt_regex_open(self, mock_show_input_panel):

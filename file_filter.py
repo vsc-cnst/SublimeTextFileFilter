@@ -113,16 +113,26 @@ SETTINGS = None
 ## PLUGIN
 ##
 
-
 def plugin_loaded() -> None:
     global SETTINGS
     SETTINGS = sublime.load_settings(SETTING_FILE_SETTINGS_NAME)
+    SETTINGS.add_on_change(SETTING_OBSERVER_KEY, settings_changed)
+
     LOGGER.info(f"plugin loaded with settings {SETTINGS}")
 
 def plugin_unloaded() -> None:
-    for handler in LOGGER.handlers[:]:
+
+    if STREAM_HANDLER:
         STREAM_HANDLER.close()
+
     LOGGER.info("plugin unloaded")
+    SETTINGS = sublime.load_settings(SETTING_FILE_SETTINGS_NAME)
+    SETTINGS.clear_on_change(SETTING_OBSERVER_KEY)
+
+
+def settings_changed() -> None:
+    SETTINGS = sublime.load_settings(SETTING_FILE_SETTINGS_NAME)
+    LOGGER.info(f"settings reloaded {SETTINGS}")
 
 
 class FileFilter(sublime_plugin.WindowCommand):
@@ -137,9 +147,6 @@ class FileFilter(sublime_plugin.WindowCommand):
         if not LOGGER.handlers:
             self.log.addHandler(STREAM_HANDLER)
         
-
-        self.REGEX_OPTIONS_LIST = ReservedRegexListOptions.all_members()
-
         self.regex = None
         self.folding_type = FoldingTypes.line
         self.highlight_type = HighlightTypes.solid
@@ -147,6 +154,7 @@ class FileFilter(sublime_plugin.WindowCommand):
         self.regex_prompt_input_panel = None
         
         SETTINGS.add_on_change(SETTING_OBSERVER_KEY, self.on_settings_change)
+        self.on_settings_change()
 
         self.log.info("Command Has Started")
 
@@ -375,10 +383,10 @@ class FileFilter(sublime_plugin.WindowCommand):
 
     def on_settings_change(self):
         self.log.debug(f"Settings changed")
-
+        
         self.REGEX_OPTIONS_LIST = ReservedRegexListOptions.all_members() + SETTINGS.get(SETTING_FILE_SETTINGS_PROP_REGEX_LIST, [])
-
-
+        self.log.debug(f"Settings changed {self.REGEX_OPTIONS_LIST}")
+        
 
 class FileFilterQuickPanelCommand(FileFilter):
 
