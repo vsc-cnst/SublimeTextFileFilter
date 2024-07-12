@@ -28,10 +28,6 @@ class TupleEnum(MyEnum):
         return obj
 
     @classmethod
-    def all_members(cls):
-        return [[member.description, member.value] for member in cls]
-
-    @classmethod
     def all_values(cls):
         return [member.value for member in cls]
 
@@ -384,7 +380,7 @@ class FileFilter(sublime_plugin.WindowCommand):
     def on_settings_change(self):
         self.log.debug(f"Settings changed")
         
-        self.REGEX_OPTIONS_LIST = ReservedRegexListOptions.all_members() + SETTINGS.get(SETTING_FILE_SETTINGS_PROP_REGEX_LIST, [])
+        self.REGEX_OPTIONS_LIST = [[r.description, r.value] for r in ReservedRegexListOptions.all_members()] + SETTINGS.get(SETTING_FILE_SETTINGS_PROP_REGEX_LIST, [])
         self.log.debug(f"Settings changed {self.REGEX_OPTIONS_LIST}")
         
 
@@ -426,7 +422,7 @@ class FileFilterSetHighlightTypeCommand(FileFilter):
         
         self.window.show_quick_panel(
             HighlightTypes.all_descriptions()
-            , on_select = lambda idx : self.command_set_highlight_type([self.highlight_type if idx < 0 else HighlightTypes.all_members()][idx])
+            , on_select = lambda idx : self.command_set_highlight_type(self.highlight_type if idx < 0 else HighlightTypes.all_members()[idx])
         )
 
 
