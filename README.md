@@ -44,6 +44,8 @@ Adjust how matched text is highlighted.
 
 1. From the `Command Palette`, run `File Filter: Highlight Style` command.
 
+![](gifs/FileFilter_HighlightTypes.gif)
+
 ### Quick Panel Command
 
 1. From the `Command Palette`, run `File Filter: Quick Panel` command.
@@ -54,6 +56,8 @@ Adjust how matched text is highlighted.
         - Settings defined options: the remaining of the list can be edited using the `File Filter: Edit Settings` command
         - Add or remove additional predefined RegExp using by editing the `regex_list` property. Each item must be ['description', "regex string"] arrays
 3. Choosing an option immediately filters the file.
+
+![](gifs/FileFilter_QuickPanel.gif)
 
 ### Edit Settings Command
 
