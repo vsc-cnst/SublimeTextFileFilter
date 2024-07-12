@@ -28,11 +28,15 @@ Matches are highlighted, and text that does not match the RegExp will be folded.
     - To change the folding style, use the command `File Filter: Folding Style`
     - To change the match areas highlight style, use the command `File Filter: Highlight Style`
 
+![](FileFilter_Filter.gif)
+
 ### Folding Style Command
 
 Adjust how content collapses around matches for better readability.
 
 1. From the `Command Palette`, run `File Filter: Folding Style` command.
+
+![](FileFilter_FoldingStyle.gif)
 
 ### Highlight Style Command
 
