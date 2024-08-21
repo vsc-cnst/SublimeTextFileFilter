@@ -86,6 +86,7 @@ if not LOGGER.handlers:
 # setting file
 SETTING_FILE_SETTINGS_NAME = 'file_filter.sublime-settings'
 SETTING_FILE_SETTINGS_PROP_REGEX_LIST = 'regex_list'
+SETTING_FILE_SETTINGS_PROP_CENTER_ON_CLEAR = 'center_on_clear'
 
     
 # keys for view.settings 
@@ -352,6 +353,9 @@ class FileFilter(sublime_plugin.WindowCommand):
         self.view.erase_regions(VIEW_SETTINGS_HIGHLIGHTED_REGIONS)
         self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_REGEX, value="")
 
+        # centers the scroll view position around the cursor
+        if self.CENTER_ON_CLEAR_OPTION:
+            self.view.show_at_center(self.view.sel()[0].begin())
 
     def fold_span(self, source, remove_last_char=False):
         
@@ -382,6 +386,7 @@ class FileFilter(sublime_plugin.WindowCommand):
         
         self.REGEX_OPTIONS_LIST = [[r.description, r.value] for r in ReservedRegexListOptions.all_members()] + SETTINGS.get(SETTING_FILE_SETTINGS_PROP_REGEX_LIST, [])
         self.log.debug(f"Settings changed {self.REGEX_OPTIONS_LIST}")
+        self.CENTER_ON_CLEAR_OPTION = SETTINGS.get(SETTING_FILE_SETTINGS_PROP_CENTER_ON_CLEAR, False)
         
 
 class FileFilterQuickPanelCommand(FileFilter):

@@ -1,4 +1,6 @@
 {
+    // centers the scroll position around the cursor on file_filter_clear
+    "center_on_clear": false,
     "regex_list": [
         ["[INF]", "\\[INF]"],
         ["Starting w/ Date Time", "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\["],
