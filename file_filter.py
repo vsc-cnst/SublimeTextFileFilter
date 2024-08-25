@@ -80,15 +80,15 @@ if not LOGGER.handlers:
     LOGGER.addHandler(STREAM_HANDLER)
 
 ##
-## SETTINGS  
+## SETTINGS FILE
 ##
 
-# setting file
 SETTING_FILE_SETTINGS_NAME = 'file_filter.sublime-settings'
-SETTING_FILE_SETTINGS_PROP_REGEX_LIST = 'regex_list'
-SETTING_FILE_SETTINGS_PROP_CENTER_ON_CLEAR = 'center_on_clear'
-    
-# keys for view.settings 
+
+ 
+##
+## keys for view.settings 
+##
 VIEW_SETTINGS_IS_FILTER_ACTIVE = 'file_filter.view_settings.is_filter_active'
 VIEW_SETTINGS_CURRENT_REGEX = 'file_filter.view_settings.current_regex'
 VIEW_SETTINGS_CURRENT_FOLDING_TYPE = 'file_filter.view_settings.current_folding_type'
@@ -250,9 +250,9 @@ class FileFilter(sublime_plugin.WindowCommand):
         if(total_matches_regions == 0):
             self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_REGEX, value= f"No Matches Regions with /{self.regex})/")
 
-        status = f'Folding {self.folding_type.value}' \
+        status = f' File Filter /{self.regex}/ ' \
+            + f'Folding {self.folding_type.value}' \
             + f' Highlight: {self.highlight_type.description}' \
-            + f' Filter /{self.regex}/' \
             + f' Total Matches {total_matches_regions}'
 
         self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_REGEX, value=status)
@@ -345,16 +345,21 @@ class FileFilter(sublime_plugin.WindowCommand):
             )
 
 
-    def clear(self):
+    def clear(self, unfold_regions=True, remove_highlights=True, center_viewport_on_carret=False):
         self.log.debug(self.get_state())
 
-        self.view.unfold(sublime.Region(0, self.view.size()))
-        self.view.erase_regions(VIEW_SETTINGS_HIGHLIGHTED_REGIONS)
-        self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_REGEX, value="")
+        if unfold_regions == True:
+            self.view.unfold(sublime.Region(0, self.view.size()))
+            
+        if remove_highlights == True:
+            self.view.erase_regions(VIEW_SETTINGS_HIGHLIGHTED_REGIONS)
 
         #center view at coursor position
-        if self.CENTER_ON_CLEAR_OPTION:
+        if center_viewport_on_carret == True:
             self.view.show_at_center(sublime.Region(0,0) if len(self.view.sel()) == 0 else self.view.sel()[0].begin(), False)
+        
+        self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_REGEX, value="")
+        self.view.settings().erase(VIEW_SETTINGS_IS_FILTER_ACTIVE)
 
     def fold_span(self, source, remove_last_char=False):
         
@@ -383,9 +388,9 @@ class FileFilter(sublime_plugin.WindowCommand):
     def on_settings_change(self):
         self.log.debug(f"Settings changed")
         
-        self.REGEX_OPTIONS_LIST = [[r.description, r.value] for r in ReservedRegexListOptions.all_members()] + SETTINGS.get(SETTING_FILE_SETTINGS_PROP_REGEX_LIST, [])
-        self.CENTER_ON_CLEAR_OPTION = SETTINGS.get(SETTING_FILE_SETTINGS_PROP_CENTER_ON_CLEAR, True)
-        self.log.debug(f"Settings changed {self.REGEX_OPTIONS_LIST}")
+        self.REGEX_OPTIONS_LIST = [[r.description, r.value] for r in ReservedRegexListOptions.all_members()] + SETTINGS.get('regex_list', [])
+        self.log.info(f"Settings changed")
+
         
 
 class FileFilterQuickPanelCommand(FileFilter):
@@ -434,9 +439,12 @@ class FileFilterClearCommand(FileFilter):
 
     def run(self):
         super().run()
-
-        self.view.settings().erase(VIEW_SETTINGS_IS_FILTER_ACTIVE)
-        self.clear()
+        
+        self.clear(
+                unfold_regions=SETTINGS.get('on_clear_options', {}).get('unfold_regions', False),
+                remove_highlights=SETTINGS.get('on_clear_options', {}).get('remove_highlights', False),
+                center_viewport_on_carret=SETTINGS.get('on_clear_options', {}).get('center_viewport_on_carret', True),
+            )
 
 
 class FileFilterListener(sublime_plugin.EventListener):
