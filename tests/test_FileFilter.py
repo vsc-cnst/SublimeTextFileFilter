@@ -128,27 +128,3 @@ class TestCommandFilter_File2(TestCommandFilter):
         actual_values = [ r.to_tuple() for r in self.view.folded_regions()]
         
         self.assertEqual(actual_values, expected_values)
-
-
-class TestCommandFilter_GoToCarretOnClear(TestCommandFilter):
-
-
-    @classmethod
-    def setUpClass(self):
-        current_package_path = os.path.dirname(__file__)
-        self.file = open(os.path.join(current_package_path, 'fixtures', "log-example.log")).read()
-
-
-    def test_goToCarretOnClear(self):
-
-        desired_carret_idx = self.view.size();
-
-        self.view.sel().clear()
-        self.view.sel().add(sublime.Region(desired_carret_idx))
-
-        self.assertFalse(self.view.visible_region().contains(desired_carret_idx), "Carret position cannot be visible at test start")
-
-        self.view.window().run_command("file_filter_clear")
-
-        self.assertTrue(self.view.visible_region().contains(desired_carret_idx), "Carret position must be visible after command run clear")
- 

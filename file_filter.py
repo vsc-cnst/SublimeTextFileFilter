@@ -441,9 +441,9 @@ class FileFilterClearCommand(FileFilter):
         super().run()
         
         self.clear(
-                unfold_regions=SETTINGS.get('on_clear_options', {}).get('unfold_regions', False),
-                remove_highlights=SETTINGS.get('on_clear_options', {}).get('remove_highlights', False),
-                center_viewport_on_carret=SETTINGS.get('on_clear_options', {}).get('center_viewport_on_carret', True),
+                unfold_regions=SETTINGS.get('on_clear_command_options', {}).get('unfold_regions', False),
+                remove_highlights=SETTINGS.get('on_clear_command_options', {}).get('remove_highlights', False),
+                center_viewport_on_carret=SETTINGS.get('on_clear_command_options', {}).get('center_viewport_on_carret', True),
             )
 
 
