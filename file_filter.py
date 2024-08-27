@@ -95,7 +95,10 @@ VIEW_SETTINGS_CURRENT_FOLDING_TYPE = 'file_filter.view_settings.current_folding_
 VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE = 'file_filter.view_settings.current_highlight_type'
 
 
-VIEW_SETTINGS_STATUS_BAR_REGEX = 'file_filter.view_settings.status_bar_regex'
+VIEW_SETTINGS_STATUS_BAR_REGEX = 'file_filter.view_settings.status_bar.regex'
+VIEW_SETTINGS_STATUS_BAR_FOLDING_STYLE = 'file_filter.view_settings.status_bar.folding_style'
+VIEW_SETTINGS_STATUS_BAR_HIGHLIGHT_STYLE = 'file_filter.view_settings.status_bar.highlight_style'
+VIEW_SETTINGS_STATUS_BAR_TOTAL_MATCHES = 'file_filter.view_settings.status_bar.total_matches'
 VIEW_SETTINGS_HIGHLIGHTED_REGIONS = 'file_filter.view_settings.highlighted_regions'
     
 KEY_MAP_CONTEXT_KEY_CLEAR = "file_filter.keymaps_context.clear"
@@ -144,9 +147,13 @@ class FileFilter(sublime_plugin.WindowCommand):
             self.log.addHandler(STREAM_HANDLER)
         
         self.regex = None
-        self.folding_type = FoldingTypes.line
-        self.highlight_type = HighlightTypes.solid
 
+        self.folding_type = FoldingTypes.line
+        self.set_folding_type(SETTINGS.get('default_folding_style', None))
+
+        self.highlight_type = HighlightTypes.solid
+        self.set_highlight_type(SETTINGS.get('default_highlight_style', None))
+        
         self.regex_prompt_input_panel = None
         
         SETTINGS.add_on_change(SETTING_OBSERVER_KEY, self.on_settings_change)
@@ -173,11 +180,17 @@ class FileFilter(sublime_plugin.WindowCommand):
             self.set_regex(regex)
             self.apply()
 
+        def on_input_change(regex):
+            self.erase_status_bar()
+            if  SETTINGS.get('expression_prompt', {}).get('refresh_on_change', False):
+                self.set_regex(regex)
+                self.apply()
+            
         self.regex_prompt_input_panel =  self.window.show_input_panel(
             "Enter regex:"
             , regex or self.regex or ""
             , on_input_done # on_done
-            , None # on_change
+            , on_input_change # on_change
             , None  # on_cancel
         )
 
@@ -197,26 +210,34 @@ class FileFilter(sublime_plugin.WindowCommand):
         self.apply()
 
     def command_set_folding_type(self, folding_type):
+        self.command_set_folding_type(folding_type)
+        self.apply()
+
+    def set_folding_type(self, folding_type):
         self.log.debug(self.get_state(folding_type))
 
-        if not folding_type or folding_type not in [ft for ft in FoldingTypes]:
-            self.view.settings().set(VIEW_SETTINGS_CURRENT_FOLDING_TYPE, FoldingTypes.line.name)
-            return
+        try:
+            self.folding_type = FoldingTypes[folding_type if isinstance(highlight_type, str) else folding_type.name]
+        except:
+            self.log.error(f"folding_type is not valid. using fallback valur '{FoldingTypes.line.name}'")
+            self.folding_type = FoldingTypes.line.name
 
         self.view.settings().set(VIEW_SETTINGS_CURRENT_FOLDING_TYPE, folding_type.name)
-        self.folding_type = folding_type
-        self.apply()
 
     def command_set_highlight_type(self, highlight_type):
+        set_highlight_type(highlight_type)
+        self.apply()
+
+    def set_highlight_type(self, highlight_type):
         self.log.debug(self.get_state(highlight_type))
         
-        if not highlight_type or highlight_type not in HighlightTypes.all_members():
-            self.view.settings().erase(VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE)
-            return
+        try:
+            self.highlight_type = HighlightTypes[ highlight_type if isinstance(highlight_type, str) else highlight_type.name]
+        except:
+            self.log.error(f"highlight_type is not valid. using fallback valur '{HighlightTypes.solid.name}'")
+            self.highlight_type = HighlightTypes.solid
 
         self.view.settings().set(VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE, highlight_type.name)
-        self.highlight_type = highlight_type
-        self.apply()
 
     def set_regex(self, regex = ""):
         self.log.debug(self.get_state(regex))
@@ -247,15 +268,23 @@ class FileFilter(sublime_plugin.WindowCommand):
         matches_regions = self.view.find_all(self.regex)
         total_matches_regions = len(matches_regions)
 
-        if(total_matches_regions == 0):
-            self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_REGEX, value= f"No Matches Regions with /{self.regex})/")
+        status_bar_settings = SETTINGS.get('status_bar', {})
 
-        status = f' File Filter /{self.regex}/ ' \
-            + f'Folding {self.folding_type.value}' \
-            + f' Highlight: {self.highlight_type.description}' \
-            + f' Total Matches {total_matches_regions}'
+        self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_REGEX, value=f'File Filter /{self.regex}/ ')
 
-        self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_REGEX, value=status)
+        if status_bar_settings.get('show_current_folding_style', True):
+            self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_FOLDING_STYLE, value=f"Folding Style: '{self.folding_type.value}'")
+
+        if status_bar_settings.get('show_current_highlight_style', True):
+            self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_HIGHLIGHT_STYLE, value=f"Highlight Style: '{self.highlight_type.description}'")
+
+
+        if status_bar_settings.get('show_total_matches', True):
+            if(total_matches_regions == 0):
+                self.view.set_status(
+                    key=VIEW_SETTINGS_STATUS_BAR_TOTAL_MATCHES,
+                    value= f' Total Matches {total_matches_regions}' if total_matches_regions > 0 else f"No Matches Regions with /{self.regex})/"
+                )
 
         if self.folding_type is not FoldingTypes.highlight_only and total_matches_regions > 0:
 
@@ -346,6 +375,7 @@ class FileFilter(sublime_plugin.WindowCommand):
 
 
     def clear(self, unfold_regions=True, remove_highlights=True, center_viewport_on_carret=False):
+
         self.log.debug(self.get_state())
 
         if unfold_regions == True:
@@ -358,7 +388,7 @@ class FileFilter(sublime_plugin.WindowCommand):
         if center_viewport_on_carret == True:
             self.view.show_at_center(sublime.Region(0,0) if len(self.view.sel()) == 0 else self.view.sel()[0].begin(), False)
         
-        self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_REGEX, value="")
+        self.erase_status_bar()
         self.view.settings().erase(VIEW_SETTINGS_IS_FILTER_ACTIVE)
 
     def fold_span(self, source, remove_last_char=False):
@@ -391,7 +421,31 @@ class FileFilter(sublime_plugin.WindowCommand):
         self.REGEX_OPTIONS_LIST = [[r.description, r.value] for r in ReservedRegexListOptions.all_members()] + SETTINGS.get('regex_list', [])
         self.log.info(f"Settings changed")
 
+    def set_status_bar(self):
+
+        self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_REGEX, value=f"File Filter: /{self.regex}/")
+
+        if status_bar_settings.get('show_current_folding_style', True):
+            self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_FOLDING_STYLE, value=f"Folding Style: '{self.folding_type.value}'")
+
+        if status_bar_settings.get('show_current_highlight_style', True):
+            self.view.set_status(key=VIEW_SETTINGS_STATUS_BAR_HIGHLIGHT_STYLE, value=f"Highlight Style: '{self.highlight_type.description}'")
+
+
+        if status_bar_settings.get('show_total_matches', True):
+            if(total_matches_regions == 0):
+                self.view.set_status(
+                    key=VIEW_SETTINGS_STATUS_BAR_TOTAL_MATCHES,
+                    value= f' Total Matches {total_matches_regions}' if total_matches_regions > 0 else f"No Matches Regions with /{self.regex})/"
+                )
+
+    def erase_status_bar(self):
         
+        self.view.erase_status(key=VIEW_SETTINGS_STATUS_BAR_REGEX)
+        self.view.erase_status(key=VIEW_SETTINGS_STATUS_BAR_FOLDING_STYLE)
+        self.view.erase_status(key=VIEW_SETTINGS_STATUS_BAR_HIGHLIGHT_STYLE)
+        self.view.erase_status(key=VIEW_SETTINGS_STATUS_BAR_TOTAL_MATCHES)
+
 
 class FileFilterQuickPanelCommand(FileFilter):
 
@@ -440,10 +494,12 @@ class FileFilterClearCommand(FileFilter):
     def run(self):
         super().run()
         
+        clear_settings = SETTINGS.get('on_clear_command_options', {})
+
         self.clear(
-                unfold_regions=SETTINGS.get('on_clear_command_options', {}).get('unfold_regions', False),
-                remove_highlights=SETTINGS.get('on_clear_command_options', {}).get('remove_highlights', False),
-                center_viewport_on_carret=SETTINGS.get('on_clear_command_options', {}).get('center_viewport_on_carret', True),
+                unfold_regions = clear_settings.get('unfold_regions', True),
+                remove_highlights = clear_settings.get('remove_highlights', True),
+                center_viewport_on_carret = clear_settings.get('center_viewport_on_carret', True),
             )
 
 

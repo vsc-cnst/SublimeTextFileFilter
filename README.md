@@ -59,13 +59,49 @@ Adjust how matched text is highlighted.
 
 ![](gifs/FileFilter_QuickPanel.gif)
 
-### Edit Settings Command
-
-1. From the `Command Palette`, run `File Filter: Edit Settings` command.
-2. Settings files will be shown.
-
 ### Clear Command
 
 Clear all filters.
 
 1. From the `Command Palette`, run `File Filter: Clear` command.
+
+
+### Edit Settings Command
+
+1. From the `Command Palette`, run `File Filter: Edit Settings` command.
+2. Settings files will be shown.
+
+#### Configuration settings file options
+
+- **`default_folding_style`**: Defines the default folding style
+  - **Possible Values**:
+    - `line`: Fold entire lines.
+    - `match_only`: Fold only the matched text.
+    - `before_only`: Fold text before the match.
+    - `after_only`: Fold text after the match.
+    - `highlight_only`: Highlight the matched text without folding.
+
+- **`default_highlight_style`**: Defines the default style for highlighting
+  - **Possible Values**:
+    - `outline`: Highlight with an outline, no fill.
+    - `solid`: Highlight with a solid fill, no outline.
+    - `underline_solid`: Highlight with a solid underline, no fill or outline.
+    - `underline_stippled`: Highlight with a stippled underline, no fill or outline.
+    - `underline_squiggly`: Highlight with a squiggly underline, no fill or outline.
+    - `none`: No highlighting.
+
+- **`expression_prompt.refresh_on_change`**: A boolean that determines whether to refresh file filter when prompt changes occur
+
+- **`status_bar`**: Configuration options related to the status bar display.
+  - **Properties**:
+    - **`show_current_folding_style`**: Boolean indicating if the current folding style should be displayed.
+    - **`show_current_highlight_style`**: Boolean indicating if the current highlight style should be displayed.
+    - **`show_total_matches`**: Boolean indicating if the total number of matches should be displayed.
+
+- **`on_clear_command_options`**: Configuration options for the clear command behavior.
+  - **Properties**:
+    - **`unfold_regions`**: Boolean determining whether to unfold regions when the clear command is issued.
+    - **`remove_highlights`**: Boolean determining whether to remove highlights when the clear command is issued.
+    - **`center_viewport_on_carret`**: Boolean determining whether to center the viewport on the caret when the clear command is issued.
+
+- **`regex_list`**: An array of regex patterns used for matching text. Each entry is an array containing two strings: a label and the corresponding regex pattern.

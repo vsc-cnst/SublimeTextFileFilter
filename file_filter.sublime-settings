@@ -1,11 +1,30 @@
- {
-    "on_clear_command_options":{
+{
+    "default_folding_style": "highlight_only",
+    "default_highlight_style": "solid",
+    "expression_prompt": {
+        "refresh_on_change": false
+    },
+    "status_bar":
+    {
+        "show_current_folding_style": true,
+        "show_current_highlight_style": true,
+        "show_total_matches": true
+    },
+    "on_clear_command_options":
+    {
         "unfold_regions": true,
         "remove_highlights": true,
         "center_viewport_on_carret": true
     },
-    "regex_list": [
-        ["[INF]", "\\[INF]"],
-        ["Starting w/ Date Time", "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\["],
+    "regex_list":
+    [
+        [
+            "[INF]",
+            "\\[INF]"
+        ],
+        [
+            "Starting w/ Date Time",
+            "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\["
+        ]
     ]
 }
