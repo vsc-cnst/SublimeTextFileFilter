@@ -62,6 +62,9 @@ class TestCommandFilter_Clear(TestCase):
     def test_UnfoldNo_RmvHighlightsNo_CenterOnCarretYes(self):
         self.run_it(False, False, True)
 
+    def test_visible_region(self):
+        self.assertEqual(sublime.Region(0,6012), self.view.visible_region())
+
     def test_UnfoldNo_RmvHighlightsNo_CenterOnCarretNo(self):
         self.run_it(False, False, False)
 
@@ -73,7 +76,7 @@ class TestCommandFilter_Clear(TestCase):
 
         command_filter = FileFilter(self.window)
         command_filter.run()
-        command_filter.set_regex(r"ApplicableState: 0")
+        command_filter.set_regex(r"Session: 30546354_29")
         
         self.assertFalse(self.view.visible_region().contains(desired_carret_idx), "Carret position cannot be visible at test start")
 

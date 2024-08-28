@@ -28,6 +28,17 @@ Matches are highlighted, and text that does not match the RegExp will be folded.
     - To change the folding style, use the command `File Filter: Folding Style`
     - To change the match areas highlight style, use the command `File Filter: Highlight Style`
 
+#### Regex flags
+
+You can use the `(?aiLmsux-imsx:...)` syntax to add flags.
+
+
+##### Example:
+using `(?:PYTHON)` as regex, filter will match lines with both `python` and `PYTHON`
+using `(?:PYTHON)outter` as regex, filter will match lines with both `pythonoutter` and `PYTHONoutter` 
+
+As this is a python plug, you can follow [python regex docs](https://docs.python.org/3/library/re.html#regular-expression-syntax) for detailed information.
+
 ![](gifs/FileFilter_Filter.gif)
 
 ### Folding Style Command
