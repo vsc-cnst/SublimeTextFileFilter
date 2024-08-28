@@ -66,7 +66,7 @@ class TestCommandPrompt(TestCase):
 
         self.window.run_command('file_filter_prompt_regex')
 
-        mock_show_input_panel.assert_called_once_with("Enter regex:", "", unittest.mock.ANY, None, None)
+        mock_show_input_panel.assert_called_once_with("Enter regex:", "", unittest.mock.ANY, unittest.mock.ANY, None)
 
 
 

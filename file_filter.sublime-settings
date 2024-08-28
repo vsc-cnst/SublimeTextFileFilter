@@ -1,5 +1,5 @@
 {
-    "default_folding_style": "highlight_only",
+    "default_folding_style": "line",
     "default_highlight_style": "solid",
     "expression_prompt": {
         "refresh_on_change": false

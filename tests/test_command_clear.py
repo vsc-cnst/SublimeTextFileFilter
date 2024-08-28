@@ -21,7 +21,7 @@ class TestCommandFilter_Clear(TestCase):
         package_dir_path = os.path.dirname(os.path.dirname(__file__))
         tests_dir_path = os.path.dirname(__file__)
 
-        self.file = open(os.path.join(tests_dir_path, 'fixtures', "log-example.log")).read()
+        self.file = open(os.path.join(tests_dir_path, 'fixtures', "windows.example.log")).read()
 
     @classmethod
     def setUp(self):
@@ -73,7 +73,7 @@ class TestCommandFilter_Clear(TestCase):
 
         command_filter = FileFilter(self.window)
         command_filter.run()
-        command_filter.set_regex(r"INFO")
+        command_filter.set_regex(r"ApplicableState: 0")
         
         self.assertFalse(self.view.visible_region().contains(desired_carret_idx), "Carret position cannot be visible at test start")
 

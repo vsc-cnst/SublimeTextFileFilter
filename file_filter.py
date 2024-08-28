@@ -148,16 +148,15 @@ class FileFilter(sublime_plugin.WindowCommand):
         
         self.regex = None
 
-        self.folding_type = FoldingTypes.line
-        self.set_folding_type(SETTINGS.get('default_folding_style', None))
-
-        self.highlight_type = HighlightTypes.solid
-        self.set_highlight_type(SETTINGS.get('default_highlight_style', None))
+        self.folding_type = None
+        self.highlight_type = None
+        
         
         self.regex_prompt_input_panel = None
         
         SETTINGS.add_on_change(SETTING_OBSERVER_KEY, self.on_settings_change)
         self.on_settings_change()
+
 
         self.log.info("Command Has Started")
 
@@ -171,6 +170,10 @@ class FileFilter(sublime_plugin.WindowCommand):
         self.regex = view_settings.get(VIEW_SETTINGS_CURRENT_REGEX, "")
         self.folding_type = FoldingTypes[view_settings.get(VIEW_SETTINGS_CURRENT_FOLDING_TYPE, FoldingTypes.line.name)]
         self.highlight_type = HighlightTypes[view_settings.get(VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE, HighlightTypes.solid.name)]
+
+        
+        self.set_folding_type(SETTINGS.get('default_folding_style', FoldingTypes.line.name))
+        self.set_highlight_type(SETTINGS.get('default_highlight_style', HighlightTypes.solid.name))
 
 
     def command_prompt_regex(self, regex=None):
@@ -210,19 +213,19 @@ class FileFilter(sublime_plugin.WindowCommand):
         self.apply()
 
     def command_set_folding_type(self, folding_type):
-        self.command_set_folding_type(folding_type)
+        self.set_folding_type(folding_type)
         self.apply()
 
     def set_folding_type(self, folding_type):
         self.log.debug(self.get_state(folding_type))
 
         try:
-            self.folding_type = FoldingTypes[folding_type if isinstance(highlight_type, str) else folding_type.name]
+            self.folding_type = FoldingTypes[folding_type] if isinstance(folding_type, str) else folding_type
         except:
-            self.log.error(f"folding_type is not valid. using fallback valur '{FoldingTypes.line.name}'")
-            self.folding_type = FoldingTypes.line.name
+            self.log.error(f"folding_type '{folding_type}' is not valid. using fallback value '{FoldingTypes.line.name}'")
+            self.folding_type = FoldingTypes.line
 
-        self.view.settings().set(VIEW_SETTINGS_CURRENT_FOLDING_TYPE, folding_type.name)
+        self.view.settings().set(VIEW_SETTINGS_CURRENT_FOLDING_TYPE, self.folding_type.name)
 
     def command_set_highlight_type(self, highlight_type):
         set_highlight_type(highlight_type)
@@ -232,12 +235,12 @@ class FileFilter(sublime_plugin.WindowCommand):
         self.log.debug(self.get_state(highlight_type))
         
         try:
-            self.highlight_type = HighlightTypes[ highlight_type if isinstance(highlight_type, str) else highlight_type.name]
+            self.highlight_type = HighlightTypes[highlight_type] if isinstance(highlight_type, str) else highlight_type
         except:
-            self.log.error(f"highlight_type is not valid. using fallback valur '{HighlightTypes.solid.name}'")
+            self.log.error(f"highlight_type is not valid. using fallback value '{HighlightTypes.solid.name}'")
             self.highlight_type = HighlightTypes.solid
 
-        self.view.settings().set(VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE, highlight_type.name)
+        self.view.settings().set(VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE, self.highlight_type.name)
 
     def set_regex(self, regex = ""):
         self.log.debug(self.get_state(regex))
@@ -411,8 +414,12 @@ class FileFilter(sublime_plugin.WindowCommand):
 
     def get_state(self, args=None):
         pad = 0
+        args = str("" if not args else args)
+        folding_type = str(self.folding_type or "") if not self.folding_type else self.folding_type.name
+        highlight_type = str(self.highlight_type or "") if not self.highlight_type else self.highlight_type.name
         regex = '\"\"' if self.regex is not None and len(self.regex) == 0 else self.regex
-        return f'args: {str(args):^{pad}},  folding_type: {self.folding_type.value:^{pad}}, highlight_type: {self.highlight_type.description:^{pad}}, regex: {regex:^{pad}}'
+
+        return f'args: {args:^{pad}}, folding_type: {folding_type:^{pad}}, highlight_type: {highlight_type:^{pad}}, regex: {regex:^{pad}}'
 
 
     def on_settings_change(self):
