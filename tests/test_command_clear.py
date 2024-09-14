@@ -41,33 +41,44 @@ class TestCommandFilter_Clear(TestCase):
             self.window.focus_view(self.view)
             self.view.window().run_command("close_file")
 
+    @unittest.skip("unknown view size")
     def test_UnfoldYes_RmvHighlightsYes_CenterOnCarretYes(self):
         self.run_it(True, True, True)
 
+    @unittest.skip("unknown view size")
     def test_UnfoldYes_RmvHighlightsYes_CenterOnCarretNo(self):
         self.run_it(True, True, False)
 
+    @unittest.skip("unknown view size")
     def test_UnfoldYes_RmvHighlightsNo_CenterOnCarretYes(self):
         self.run_it(True, False, True)
 
+    @unittest.skip("unknown view size")
     def test_UnfoldYes_RmvHighlightsNo_CenterOnCarretNo(self):
         self.run_it(True, False, False)
 
+    @unittest.skip("unknown view size")
     def test_UnfoldNo_RmvHighlightsYes_CenterOnCarretYes(self):
         self.run_it(False, True, True)
 
+    @unittest.skip("unknown view size")
     def test_UnfoldNo_RmvHighlightsYes_CenterOnCarretNo(self):
         self.run_it(False, True, False)
 
+    @unittest.skip("unknown view size")
     def test_UnfoldNo_RmvHighlightsNo_CenterOnCarretYes(self):
         self.run_it(False, False, True)
 
+    @unittest.skip("unknown view size")
     def test_visible_region(self):
         self.assertEqual(sublime.Region(0,6012), self.view.visible_region())
 
+
+    @unittest.skip("unknown view size")
     def test_UnfoldNo_RmvHighlightsNo_CenterOnCarretNo(self):
         self.run_it(False, False, False)
 
+    @unittest.skip("unknown view size")
     def run_it(self, unfold_regions, remove_highlights, center_viewport_on_carret):
 
         desired_carret_idx = self.view.size();

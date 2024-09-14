@@ -1,30 +1,27 @@
 {
-    "default_folding_style": "line",
-    "default_highlight_style": "solid",
+    "default_folding_type": "line",
+    "default_highlight_type": "solid",
+    "escape_key_action": "none/clear",
     "expression_prompt": {
-        "refresh_on_change": false
-    },
-    "status_bar":
-    {
-        "show_current_folding_style": true,
-        "show_current_highlight_style": true,
+        "filter_on_change": false,
         "show_total_matches": true
     },
-    "on_clear_command_options":
-    {
-        "unfold_regions": true,
+    "favorits": [
+        {
+            "description": "logs info",
+            "expression": "\\[INF]",
+            "name": "logs info"
+        },
+        {
+            "description": "",
+            "expression": "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\[",
+            "name": "Starting w/ Date Time"
+        }
+    ],
+    "global_regex_flags": "gi",
+    "on_clear_command": {
+        "center_viewport_on_carret": true,
         "remove_highlights": true,
-        "center_viewport_on_carret": true
-    },
-    "regex_list":
-    [
-        [
-            "[INF]",
-            "\\[INF]"
-        ],
-        [
-            "Starting w/ Date Time",
-            "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\["
-        ]
-    ]
+        "unfold_regions": true
+    }
 }

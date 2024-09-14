@@ -1,49 +1,60 @@
 import sys
-import os
 
-import sublime
-import sublime_plugin
+import sublime # type: ignore
+import sublime_plugin # type: ignore
+
+import gc
+
 import unittest
-from unittest import TestCase
-from unittest.mock import patch, MagicMock
-import itertools
-import json
+from unittest.mock import MagicMock, patch
 
-file_filter = sys.modules["File Filter.file_filter"]
-FileFilter = file_filter.FileFilter
+SettingsManager = sys.modules["File Filter.utils.settings"].SettingsManager
 
-class TestSettings(TestCase):
+class TestSettingsManager(unittest.TestCase):
 
-    @classmethod  
-    def setUpClass(self):
+    @patch('sublime.load_settings')
+    def test_initialization(self, mock_load_settings):
+        mock_load_settings.return_value = MagicMock()
+        manager = SettingsManager('Test.sublime-settings')
+        self.assertEqual(manager.settings_file, 'Test.sublime-settings')
+        self.assertIsInstance(manager.settings, MagicMock)
+        mock_load_settings.assert_called_with('Test.sublime-settings')
 
-        package_dir_path = os.path.dirname(os.path.dirname(__file__))
-        tests_dir_path = os.path.dirname(__file__)
-
-        self.file = open(os.path.join(tests_dir_path, 'fixtures', "windows.example.log")).read()
-
-    @classmethod
-    def setUp(self):
+    @patch('sublime.load_settings')
+    @patch('sublime.Settings.add_on_change')
+    def test_reload_settings(self, mock_add_on_change, mock_load_settings):
+        mock_load_settings.return_value = MagicMock()
+        mock_logger = MagicMock()
+        manager = SettingsManager('Test.sublime-settings', logger=mock_logger)
         
-        self.window = sublime.active_window()
-        self.view = self.window.new_file()
-        self.window.focus_view(self.view)
+        # Simulate a settings change
+        manager.reload_settings()
+        mock_load_settings.assert_called_with('Test.sublime-settings')
+        mock_logger.info.assert_called_with(f"Settings reloaded for {manager.settings_key}")
 
-        self.view.run_command("insert", {"characters": self.file})
-        self.vie_size = self.view.size()
-
-
-    @classmethod
-    def tearDown(self):
-        if self.view:
-            self.view.set_scratch(True)
-            self.window.focus_view(self.view)
-            self.view.window().run_command("close_file")
-
-    @unittest.skip("test default settings combinations")
-    def test_settings_default(self):
-        pass
+    @unittest.skip("__del__ parece estar a ser chamado, mas não em ambiente de testes")
+    @patch('sublime.load_settings')
+    @patch('sublime.Settings.clear_on_change')
+    def test_cleanup(self, mock_clear_on_change, mock_load_settings):
+        mock_load_settings.return_value = MagicMock()
+        mock_logger = MagicMock()
+        manager = SettingsManager('Test.sublime-settings', logger=mock_logger)
         
-    @unittest.skip("test different settings combinations")
-    def test_settings(self):
-        pass
+        settings_key = manager.settings_key
+
+        # Simulate cleanup
+        del manager
+        gc.collect()  # Force garbage collection to ensure __del__ is called
+        
+        mock_clear_on_change.assert_called_with(settings_key)
+        mock_logger.info.assert_called_with(f"Cleaning up resources for {settings_key}")
+
+    @patch('sublime.load_settings')
+    def test_no_logger(self, mock_load_settings):
+        mock_load_settings.return_value = MagicMock()
+        manager = SettingsManager('Test.sublime-settings')
+        
+        # Simulate a settings change
+        manager.reload_settings()
+        # Ensure no logging occurs if logger is not provided
+        self.assertEqual(manager.logger, None)

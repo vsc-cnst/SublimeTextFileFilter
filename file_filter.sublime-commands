@@ -1,23 +1,19 @@
 [
     {
         "caption": "File Filter",
-        "command": "file_filter_prompt_regex"
+        "command": "file_filter"
     },
     {
-        "caption": "File Filter : Quick Panel",
-        "command": "file_filter_quick_panel"
+        "caption": "File Filter : Folding Type",
+        "command": "set_folding_type"
     },
     {
-        "caption": "File Filter : Folding Style",
-        "command": "file_filter_set_folding_type"
-    },
-    {
-        "caption": "File Filter : Highlight Style",
-        "command": "file_filter_set_highlight_type"
+        "caption": "File Filter : Highlight Type",
+        "command": "set_highlight_type"
     },
     {
         "caption": "File Filter : Clear",
-        "command": "file_filter_clear"
+        "command": "clear"
     },
     {
         "caption": "File Filter : Edit Settings",
