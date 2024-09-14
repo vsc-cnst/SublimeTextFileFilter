@@ -1,5 +1,5 @@
 import sublime # type: ignore
-from utils.utils import stringify
+from .utils import stringify
 
 from .enums import FoldingTypes, HighlightTypes
 

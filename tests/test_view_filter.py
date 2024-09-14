@@ -50,7 +50,7 @@ class TestViewCommandFilter(TestCase):
         self.assertEqual(actual_values, expected_values)
 
 
-class TestViewFilterOnFile1(TestCommandFilter):     
+class TestViewFilterOnFile1(TestViewCommandFilter):     
 
     @classmethod
     def setUpClass(self):
@@ -70,7 +70,7 @@ class TestViewFilterOnFile1(TestCommandFilter):
         self.run_filter(r"[0-9]", FoldingTypes.after_only, [(0, 3) , (6, 11), (14, 19), (24, 25)])
 
 
-class TestViewFilterOnFile2(TestCommandFilter):
+class TestViewFilterOnFile2(TestViewCommandFilter):
 
     @classmethod
     def setUpClass(self):
