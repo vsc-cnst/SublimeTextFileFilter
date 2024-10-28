@@ -26,6 +26,7 @@ KEY_MAP_CONTEXT_KEY_CLEAR = "file_filter.keymaps_context.clear"
 ##
 ##
 
+# log level defined in CustomLogger
 logging.setLoggerClass(CustomLogger)
 LOGGER = logging.getLogger('FileFilter')
 
@@ -226,7 +227,6 @@ class SetFoldingTypeCommand(commands_override.TextCommand):
     def run(self, edit, folding_types=None):
         self.logger.debug(folding_types=folding_types)
 
-
     def input(self, args):
         self.logger.debug(args)
         return FoldingTypesInputHandler(self.view, self.settings_file, self.logger)
@@ -271,7 +271,6 @@ class HighlightTypesInputHandler(commands_override.ListInputHandler):
 
     def list_items(self):
         return [(ft.description, ft.name) for ft in HighlightTypes.all_members()]
-
 
     def confirm(self, highlight_type):
         self.logger.debug(highlight_type=highlight_type)

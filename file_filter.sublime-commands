@@ -4,11 +4,11 @@
         "command": "file_filter"
     },
     {
-        "caption": "File Filter : Folding Type",
+        "caption": "File Filter : Set Folding Type",
         "command": "set_folding_type"
     },
     {
-        "caption": "File Filter : Highlight Type",
+        "caption": "File Filter : Set Highlight Type",
         "command": "set_highlight_type"
     },
     {

@@ -7,6 +7,7 @@ class CustomLogger(logging.Logger):
 
     def __init__(self, name, level=logging.INFO):
         super().__init__(name, level)
+        self.info(f"[File Filter][CustomLogger] init")
         
         formatter = logging.Formatter(f"[%(levelname)3s][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" )
 
@@ -23,7 +24,7 @@ class CustomLogger(logging.Logger):
         else:
             self.setLevel(logging.ERROR)
 
-        self.info(f"creating logger with log level 'DEBUG' ({logging.DEBUG})")
+        self.info(f"[File Filter] Creating logger with log level 'DEBUG' ({logging.DEBUG})")
         # Set default logging level
 
     def debug(self, *args, **kwargs):

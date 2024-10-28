@@ -12,6 +12,10 @@ class MyEnum(Enum):
     def all_values(cls):
         return [member._value_ for member in cls]
 
+    @classmethod
+    def all_names(cls):
+        return [member.name for member in cls]
+
 
 class FoldingTypes(MyEnum):
 

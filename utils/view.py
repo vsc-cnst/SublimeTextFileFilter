@@ -123,7 +123,8 @@ def filter(log, view: sublime.View, regex, folding_type, highlight_type):
 
         # status_bar_settings = SETTINGS.get('status_bar', {})
 
-       
+        regions_to_fold = []
+
         if folding_type is not FoldingTypes.highlight_only and total_matches_regions > 0:
 
             temp_fold_regions = [sublime.Region(0, 0)] + matches_regions + [sublime.Region(view_size, view_size)]
@@ -167,40 +168,49 @@ def filter(log, view: sublime.View, regex, folding_type, highlight_type):
                 if folding_type == FoldingTypes.match_only:
 
                     if fold is first_fold:
-                        fold_span(log, view, [first, middle], remove_last_char=True)
-                        fold_span(log, view, last)
+                        regions_to_fold.append(calc_span(log, view, [first, middle], remove_last_char=True))
+                        regions_to_fold.append(calc_span(log, view, last))
                     elif a == b:
-                        fold_span(log, view, [middle], remove_last_char=False)
+                        regions_to_fold.append(calc_span(log, view, [middle], remove_last_char=False))
                     else:
-                        fold_span(log, view, [first,middle], remove_last_char=True)
-                        fold_span(log, view, last)
+                        regions_to_fold.append(calc_span(log, view, [first,middle], remove_last_char=True))
+                        regions_to_fold.append(calc_span(log, view, last))
 
                 elif folding_type is FoldingTypes.line:
 
                     if fold is first_fold:
-                        fold_span(log, view, [first, middle], remove_last_char=True)
+                        regions_to_fold.append(calc_span(log, view, [first, middle], remove_last_char=True))
                     if fold is last_fold and a!=b:
-                        fold_span(log, view, [middle, last])
+                        regions_to_fold.append(calc_span(log, view, [middle, last]))
                     elif a != b:
                         middle.a = middle.a - 1
-                        fold_span(log, view, [middle], remove_last_char=True)
+                        regions_to_fold.append(calc_span(log, view, [middle], remove_last_char=True))
 
 
                 elif folding_type is FoldingTypes.before_only:
 
                     if fold is first_fold:
-                        fold_span(log, view, [first, last], remove_last_char=False)
+                        regions_to_fold.append(calc_span(log, view, [first, last], remove_last_char=False))
                     elif a != b:
-                       fold_span(log, view, [middle, last], remove_last_char=False)
+                       regions_to_fold.append(calc_span(log, view, [middle, last], remove_last_char=False))
                     else:
-                        fold_span(log, view, [last], remove_last_char=False)
+                        regions_to_fold.append(calc_span(log, view, [last], remove_last_char=False))
 
                 elif folding_type is FoldingTypes.after_only:
 
                     if fold is last_fold:
-                        fold_span(log, view, fold)
+                        regions_to_fold.append(calc_span(log, view, fold))
                     else:
-                        fold_span(log, view, [first, middle], remove_last_char=True)
+                        regions_to_fold.append(calc_span(log, view, [first, middle], remove_last_char=True))
+
+        #print("======== regions_to_fold")
+        #print([r for r in regions_to_fold if bool(r)])
+        #print("========")
+        
+        log.debug(regions_to_fold=[r for r in regions_to_fold if bool(r)])
+
+        ## fold regions
+        view.fold([r for r in regions_to_fold if bool(r)])
 
         if highlight_type is not HighlightTypes.none:
             view.add_regions(
@@ -212,7 +222,7 @@ def filter(log, view: sublime.View, regex, folding_type, highlight_type):
             )
 
 
-def fold_span(log, view: sublime.View, source, remove_last_char=False):
+def calc_span(log, view: sublime.View, source, remove_last_char=False):
         log.debug(remove_last_char)
         
         if type(source) is list:
@@ -228,7 +238,7 @@ def fold_span(log, view: sublime.View, source, remove_last_char=False):
         
         log.debug(f"from {source} folding {(a, b)}, remove_last_char: {remove_last_char}")
 
-        return view.fold(sublime.Region(a, b))
+        return sublime.Region(a, b)
 
 
 def add_to_history(logger, view: sublime.View, item):
