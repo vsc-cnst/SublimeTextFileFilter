@@ -1,5 +1,6 @@
 import logging
 import sublime_plugin # type: ignore
+import re
 
 from .utils import commands_override
 
@@ -73,9 +74,9 @@ class OptionsInputHandler(commands_override.ListInputHandler):
         self.logger.debug('')
         return [
             ("New", "new"),
-            ("New from selection", "selection"),
-            ("From history", "history"),
-            ("From favorites", "favorites"),
+            ("From Selected Text", "from_selection"),
+            ("History", "history"),
+            ("Favorites", "favorites"),
             ("Clear", "clear")
         ]
 
@@ -87,8 +88,11 @@ class OptionsInputHandler(commands_override.ListInputHandler):
             return RegexInputHandler(self.view, self.settings_file, self.logger)
         if selected_option == "history":
             return HistoryInputHandler(self.view, self.settings_file, self.logger)
-        if selected_option == "selection":
-            return RegexInputHandler(self.view, self.settings_file, self.logger, "selected text")
+        if selected_option == "from_selection":
+            from_selection_settings = self.settings.get('from_selected_text_options', {})
+            escape = from_selection_settings["escape_selection"] or False
+            text = self.view.substr(self.view.sel()[0])
+            return RegexInputHandler(self.view, self.settings_file, self.logger, re.escape(text or "") if escape else text)
         if selected_option == "favorites":
             return FavoritsInputHandler(self.view, self.settings_file, self.logger)
         if selected_option == "clear":
@@ -309,6 +313,7 @@ class ClearCommand(commands_override.WindowCommand):
 ## -
 ##
 ##
+
 class FileFilterListener(sublime_plugin.EventListener):
 
     def on_query_context(self, view, key, operator, operand, match_all):

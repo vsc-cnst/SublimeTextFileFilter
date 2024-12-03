@@ -6,6 +6,9 @@
         "filter_on_change": false,
         "show_total_matches": true
     },
+    "from_selected_text_options":{
+        "escape_selection": true
+    },
     "favorits": [
         {
             "description": "logs info",
