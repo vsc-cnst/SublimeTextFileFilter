@@ -89,14 +89,14 @@ class OptionsInputHandler(commands_override.ListInputHandler):
         if selected_option == "history":
             return HistoryInputHandler(self.view, self.settings_file, self.logger)
         if selected_option == "from_selection":
-            from_selection_settings = self.settings.get('from_selected_text_options', {})
+            from_selection_settings = self.settings.get('option_from_selected_text', {})
             escape = from_selection_settings["escape_selection"] or False
             text = self.view.substr(self.view.sel()[0])
             return RegexInputHandler(self.view, self.settings_file, self.logger, re.escape(text or "") if escape else text)
         if selected_option == "favorites":
             return FavoritsInputHandler(self.view, self.settings_file, self.logger)
         if selected_option == "clear":
-            clear_settings = self.settings.get('on_clear_command_options', {})
+            clear_settings = self.settings.get('option_command_on_clear', {})
             view_utils.clear(
                 self.logger,
                 self.view,
@@ -117,10 +117,10 @@ class HistoryInputHandler(commands_override.ListInputHandler):
         return "history"
 
     def list_items(self):
-        iist_items = self.view.settings().get(VIEW_SETTINGS_REGEX_HISTORY, [])
-        iist_items = iist_items if bool(iist_items) else ['** empty history **']
-        self.logger.debug(iist_items=iist_items)
-        return iist_items
+        ist_items = self.view.settings().get(VIEW_SETTINGS_REGEX_HISTORY, [])
+        ist_items = ist_items if bool(ist_items) else ['** empty history **']
+        self.logger.debug(ist_items=ist_items)
+        return ist_items
 
     def preview(self, value):
         self.logger.debug(value)
@@ -150,7 +150,7 @@ class FavoritsInputHandler(commands_override.ListInputHandler):
         return "favorites"
 
     def list_items(self):
-        favorits = self.settings.get('favorits', [])
+        favorits = self.settings.get('option_favorits', {}).get('favorits', [])
         return [(f.get('name', ""), f.get('expression', "")) for f in favorits]
 
     def confirm(self, text):
@@ -195,12 +195,17 @@ class RegexInputHandler(commands_override.TextInputHandler):
         self.logger.debug(value)
         if len(value) == 0 :
             return
-
+        
+        filter_on_change = False # TODO : filter_on_change = self.settings.get('expression_prompt', {}).get('filter_on_change', False)
+        show_total_matches = self.settings.get('expression_prompt', {}).get('show_total_matches', False)
+        
         return mini_html.create_preview(
-            ("Total matches",len(self.view.find_all(value))),
+            ("Total matches", len(self.view.find_all(value))) if show_total_matches else None,
             [
-                ('Folding:', view_utils.get_folding_type(self.logger, self.view, self.settings).value),
-                ('Highlight:',view_utils.get_highlight_type(self.logger, self.view, self.settings).description)
+                ("<i>Show total matches</i>", "off") if not show_total_matches else None,
+                ("Filter on change", "on" if filter_on_change else "off") if not filter_on_change else None,
+                ('Folding', view_utils.get_folding_type(self.logger, self.view, self.settings).value),
+                ('Highlight',view_utils.get_highlight_type(self.logger, self.view, self.settings).description)
             ]
         )
 
@@ -298,7 +303,7 @@ class ClearCommand(commands_override.WindowCommand):
     def run(self):
         super().run()
         
-        clear_settings = self.settings.get('on_clear_command_options', {})
+        clear_settings = self.settings.get('option_command_on_clear', {})
 
         view_utils.clear(
             self.logger,

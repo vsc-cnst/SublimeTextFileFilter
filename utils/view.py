@@ -78,7 +78,7 @@ def set_highlight_type(log, view: sublime.View, settings: sublime.Settings, high
             raise ValueError("Invalid highlight_type format")
 
     except Exception as e:
-        highlight_type = HighlightTypes[view.settings().get(VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE, settings.get('default_highlight_type', HighlightTypes.solid.name))]
+        highlight_type = HighlightTypes[view.settings().get(VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE, settings.get('default_highlight', {}).get('type', HighlightTypes.solid.name))]
 
     log.info(f"highlight_type set to '{highlight_type.name}'")
     view.settings().set(VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE, highlight_type.name)
@@ -220,6 +220,8 @@ def filter(log, view: sublime.View, regex, folding_type, highlight_type):
                 , ''  # No icon
                 , highlight_type.value
             )
+            
+        return regions_to_fold
 
 
 def calc_span(log, view: sublime.View, source, remove_last_char=False):

@@ -5,12 +5,12 @@ def create_preview(
     sub_items: list = []
 ):
     # Prepare content for the main item, if provided
-    main_html = f'<div class="item"><span>{main[0]}</span>&nbsp;<span>{main[1]}</span></div>' if main else ''
+    main_html = f'<div class="item"><span>{main[0]}</span>&nbsp;<span>{main[1]}</span></div>' if bool(main) else ''
 
     # Prepare content for sub-items
     sub_items_html = ''.join(
-        f'<div class="item"><span>{item[0]}</span>&nbsp;<span><i>{item[1]}</i></span></div>'
-        for item in sub_items
+        f'<div class="item"><span><i>{item[0]}</i></span>&nbsp;<span><i>{item[1]}</i></span></div>'
+        for item in sub_items if bool(item)
     )
 
     return sublime.Html(f"""
