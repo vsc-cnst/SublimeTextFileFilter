@@ -9,23 +9,18 @@ class CustomLogger(logging.Logger):
         super().__init__(name, level)
         self.info(f"[File Filter][CustomLogger] init")
         
-        formatter = logging.Formatter(f"[%(levelname)3s][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" )
+        formatter = logging.Formatter(f"[FileFilter][%(levelname)3s][%(name)s.%(funcName)s():%(lineno)s]  %(message)s" )
 
         # Create and configure a StreamHandler
         self.stream_handler = logging.StreamHandler()
         self.stream_handler.setFormatter(formatter)
         self.addHandler(self.stream_handler)
 
+        if not bool(os.environ.get('STFileFilterEnv')):
+            level = logging.ERROR
+        
         self.setLevel(level)
-
-
-        if bool(os.environ.get('STFileFilterEnv')):
-            self.setLevel(logging.DEBUG)
-        else:
-            self.setLevel(logging.ERROR)
-
         self.info(f"[File Filter] Creating logger with log level 'DEBUG' ({logging.DEBUG})")
-        # Set default logging level
 
     def debug(self, *args, **kwargs):
         msg = stringify(*args, **kwargs)
