@@ -150,14 +150,15 @@ class FavoritsInputHandler(commands_override.ListInputHandler):
         return "favorites"
 
     def list_items(self):
-        favorits = self.settings.get('option_favorits', {}).get('favorits', [])
+        favorits = self.settings.get('favorits', [])
         return [(f.get('name', ""), f.get('expression', "")) for f in favorits]
 
     def confirm(self, text):
         self.logger.debug(text)
 
+        print("---")
         view_utils.add_to_history(self.logger, self.view, text)
-
+        print("2---")
         view_utils.filter(self.logger, self.view, text, view_utils.get_folding_type(self.logger, self.view, self.settings), view_utils.get_highlight_type(self.logger, self.view, self.settings))
 
 
