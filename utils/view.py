@@ -105,123 +105,147 @@ def clear(log, view: sublime.View, unfold_regions=True, remove_highlights=True, 
 
 
 def filter(log, view: sublime.View, regex, folding_type, highlight_type):
-        log.debug(folding_type=folding_type,highlight_type=highlight_type,regex=regex)
+    print('1')
+    log.debug("filter", folding_type=folding_type,highlight_type=highlight_type,regex=regex)
+    print('2')
 
-        if not regex:
-            log.warning("No regex")
-            return
+    if not regex:
+        log.warning("No regex")
+        return
+    print('3')
 
-        clear(log, view)
+    clear(log, view)
 
-        view.settings().set(VIEW_SETTINGS_IS_FILTER_ACTIVE, True)
-        view.settings().set(VIEW_SETTINGS_CURRENT_REGEX, regex)
-    
-        view_size = view.size()
+    view.settings().set(VIEW_SETTINGS_IS_FILTER_ACTIVE, True)
+    view.settings().set(VIEW_SETTINGS_CURRENT_REGEX, regex)
 
-        matches_regions = view.find_all(regex)
-        total_matches_regions = len(matches_regions)
+    view_size = view.size()
 
-        # status_bar_settings = SETTINGS.get('status_bar', {})
+    matches_regions = view.find_all(regex)
+    total_matches_regions = len(matches_regions)
 
-        regions_to_fold = []
+    # status_bar_settings = SETTINGS.get('status_bar', {})
 
-        if folding_type is not FoldingTypes.highlight_only and total_matches_regions > 0:
+    regions_to_fold = []
 
-            temp_fold_regions = [sublime.Region(0, 0)] + matches_regions + [sublime.Region(view_size, view_size)]
-            fold_regions = [ sublime.Region(prev.end(), curr.begin()) for prev, curr in zip(temp_fold_regions, temp_fold_regions[1:])]
-            
-            first_fold = fold_regions[0]
-            last_fold = fold_regions[-1]
-            
-            log.debug(fold_regions)
+    if folding_type is not FoldingTypes.highlight_only and total_matches_regions > 0:
 
-            # fold lines with no match
-            for fold in fold_regions:
-
-                log.debug(f'.current fold: {fold}.')
-                if fold == first_fold :
-                    log.debug(f'is first fold')
-                if fold == last_fold :
-                    log.debug(f'is last fold')
-
-                if fold.size() <= 0 or fold.begin() >= fold.end():
-                    log.debug(f'Invalidfold size. continue..')
-                    continue
-
-                a = view.full_line(fold.begin())
-                b = view.full_line(fold.end())
-
-                log.debug(f'line a: {a}, line b:{b}')
-
-                if a == b:
-                    log.debug(f'a == b. same line')
-                    first = sublime.Region(fold.begin(), fold.begin())
-                    middle = fold
-                    last = sublime.Region(fold.end(),fold.end()) 
-                else:
-                    first = sublime.Region(fold.begin(), a.end())
-                    middle = sublime.Region(a.end(),b.begin())
-                    last = sublime.Region(b.begin(),fold.end())  
-
-                log.debug(f'first {first}, middle {middle}, last {last}')
-
-                if folding_type == FoldingTypes.match_only:
-
-                    if fold is first_fold:
-                        regions_to_fold.append(calc_span(log, view, [first, middle], remove_last_char=True))
-                        regions_to_fold.append(calc_span(log, view, last))
-                    elif a == b:
-                        regions_to_fold.append(calc_span(log, view, [middle], remove_last_char=False))
-                    else:
-                        regions_to_fold.append(calc_span(log, view, [first,middle], remove_last_char=True))
-                        regions_to_fold.append(calc_span(log, view, last))
-
-                elif folding_type is FoldingTypes.line:
-
-                    if fold is first_fold:
-                        regions_to_fold.append(calc_span(log, view, [first, middle], remove_last_char=True))
-                    if fold is last_fold and a!=b:
-                        regions_to_fold.append(calc_span(log, view, [middle, last]))
-                    elif a != b:
-                        middle.a = middle.a - 1
-                        regions_to_fold.append(calc_span(log, view, [middle], remove_last_char=True))
-
-
-                elif folding_type is FoldingTypes.before_only:
-
-                    if fold is first_fold:
-                        regions_to_fold.append(calc_span(log, view, [first, last], remove_last_char=False))
-                    elif a != b:
-                       regions_to_fold.append(calc_span(log, view, [middle, last], remove_last_char=False))
-                    else:
-                        regions_to_fold.append(calc_span(log, view, [last], remove_last_char=False))
-
-                elif folding_type is FoldingTypes.after_only:
-
-                    if fold is last_fold:
-                        regions_to_fold.append(calc_span(log, view, fold))
-                    else:
-                        regions_to_fold.append(calc_span(log, view, [first, middle], remove_last_char=True))
-
-        #print("======== regions_to_fold")
-        #print([r for r in regions_to_fold if bool(r)])
-        #print("========")
+        temp_fold_regions = [sublime.Region(0, 0)] + matches_regions + [sublime.Region(view_size, view_size)]
+        fold_regions = [ sublime.Region(prev.end(), curr.begin()) for prev, curr in zip(temp_fold_regions, temp_fold_regions[1:])]
         
-        log.debug(regions_to_fold=[r for r in regions_to_fold if bool(r)])
+        first_fold = fold_regions[0]
+        last_fold = fold_regions[-1]
+        
+        log.debug(fold_regions)
 
-        ## fold regions
-        view.fold([r for r in regions_to_fold if bool(r)])
+        # fold lines with no match
+        for fold in fold_regions:
 
-        if highlight_type is not HighlightTypes.none:
-            view.add_regions(
-                VIEW_SETTINGS_HIGHLIGHTED_REGIONS  # Key for the highlighted regions
-                , matches_regions  # List of regions to highlight
-                , 'highlight'  # Scope name (use a predefined or custom scope)
-                , ''  # No icon
-                , highlight_type.value
-            )
-            
-        return regions_to_fold
+            log.debug(f'.current fold: {fold}.')
+            if fold == first_fold :
+                log.debug(f'is first fold')
+            if fold == last_fold :
+                log.debug(f'is last fold')
+
+            if fold.size() <= 0 or fold.begin() >= fold.end():
+                log.debug(f'Invalidfold size. continue..')
+                continue
+
+            a = view.full_line(fold.begin())
+            b = view.full_line(fold.end())
+
+            log.debug(f'line a: {a}, line b:{b}')
+
+            if a == b:
+                log.debug(f'a == b. same line')
+                first = sublime.Region(fold.begin(), fold.begin())
+                middle = fold
+                last = sublime.Region(fold.end(),fold.end()) 
+            else:
+                first = sublime.Region(fold.begin(), a.end())
+                middle = sublime.Region(a.end(),b.begin())
+                last = sublime.Region(b.begin(),fold.end())  
+
+            log.debug(f'first {first}, middle {middle}, last {last}')
+
+            if folding_type == FoldingTypes.match_only:
+
+                if fold is first_fold:
+                    regions_to_fold.append(calc_span(log, view, [first, middle], remove_last_char=True))
+                    regions_to_fold.append(calc_span(log, view, last))
+                elif a == b:
+                    regions_to_fold.append(calc_span(log, view, [middle], remove_last_char=False))
+                else:
+                    regions_to_fold.append(calc_span(log, view, [first,middle], remove_last_char=True))
+                    regions_to_fold.append(calc_span(log, view, last))
+
+            elif folding_type is FoldingTypes.line:
+
+                if fold is first_fold:
+                    regions_to_fold.append(calc_span(log, view, [first, middle], remove_last_char=True))
+                if fold is last_fold and a!=b:
+                    regions_to_fold.append(calc_span(log, view, [middle, last]))
+                elif a != b:
+                    middle.a = middle.a - 1
+                    regions_to_fold.append(calc_span(log, view, [middle], remove_last_char=True))
+
+
+            elif folding_type is FoldingTypes.before_only:
+
+                if fold is first_fold:
+                    regions_to_fold.append(calc_span(log, view, [first, last], remove_last_char=False))
+                elif a != b:
+                   regions_to_fold.append(calc_span(log, view, [middle, last], remove_last_char=False))
+                else:
+                    regions_to_fold.append(calc_span(log, view, [last], remove_last_char=False))
+
+            elif folding_type is FoldingTypes.after_only:
+
+                if fold is last_fold:
+                    regions_to_fold.append(calc_span(log, view, fold))
+                else:
+                    regions_to_fold.append(calc_span(log, view, [first, middle], remove_last_char=True))
+
+    #print("======== regions_to_fold")
+    #print([r for r in regions_to_fold if bool(r)])
+    #print("========")
+    
+    log.debug(regions_to_fold=[r for r in regions_to_fold if bool(r)])
+    
+    ## fold regions
+    view.fold([r for r in regions_to_fold if bool(r)])
+
+    if highlight_type is not HighlightTypes.none:
+        view.add_regions(
+            key = VIEW_SETTINGS_HIGHLIGHTED_REGIONS  # Key for the highlighted regions
+            , regions = matches_regions  # List of regions to highlight
+            , scope = 'highlight'  # Scope name (use a predefined or custom scope)
+            , icon = ''  # No icon
+            , flags = highlight_type.value
+            , annotations = [] # annotations
+            , annotation_color = "#32a852" # color
+        )
+        
+    return regions_to_fold
+
+
+# def highlight(log, view: sublime.View, expression, matches_regions):
+    
+#     log.debug(expression=expression, matches_regions=[r for r in regions_to_fold if bool(r)])
+    
+
+#     for match in matches_regions:
+#         if highlight_type is not HighlightTypes.none:
+#             view.add_regions(
+#                 key = VIEW_SETTINGS_HIGHLIGHTED_REGIONS  # Key for the highlighted regions
+#                 , regions = matches_regions  # List of regions to highlight
+#                 , scope = 'highlight'  # Scope name (use a predefined or custom scope)
+#                 , icon = ''  # No icon
+#                 , flags = highlight_type.value
+#                 , annotations = [] # annotations
+#                 , annotation_color = "#32a852" # color
+#             )
+        
 
 
 def calc_span(log, view: sublime.View, source, remove_last_char=False):

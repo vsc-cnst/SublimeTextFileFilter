@@ -3,7 +3,7 @@
     "global_regex_flags": "gi",
     "default_folding_type": "line",
     "expression_prompt": {
-        "filter_on_change": false,
+        "filter_on_change": true,
         "show_total_matches": true
     },
     "default_highlight":{
@@ -13,27 +13,21 @@
     "option_from_selected_text":{
         "escape_selection": true
     },
-    "option_favorits": {
-        "favorits": [
-            {
-                "description": "logs info",
-                "expression": "\\[INF]",
-                "name": "logs info",
-                "highlight":{
-                    "type":"solid",
-                    "color":"color"
-                }
-            },
-            {
-                "description": "",
-                "expression": "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\[",
-                "name": "Starting w/ Date Time"
-            }
-        ]
-    },
     "option_command_on_clear": {
         "center_viewport_on_carret": true,
         "remove_highlights": true,
         "unfold_regions": true
-    }
+    },     
+    "favorits": [
+        {   
+            "name": "logs info",
+            "description": "logs info",
+            "pattern": "\\[INF]",
+        },
+        {
+            "name": "Starting w/ Date Time",
+            "description": "",
+            "pattern": "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\[",
+        }
+    ]
 }

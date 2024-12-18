@@ -143,7 +143,9 @@ class HistoryInputHandler(commands_override.ListInputHandler):
 
         view_utils.filter(self.logger, self.view, text, view_utils.get_folding_type(self.logger, self.view, self.settings), view_utils.get_highlight_type(self.logger, self.view, self.settings))
 
-        
+    def cancel():
+        pass
+
 class FavoritsInputHandler(commands_override.ListInputHandler):
     
     def name(self):
@@ -156,11 +158,13 @@ class FavoritsInputHandler(commands_override.ListInputHandler):
     def confirm(self, text):
         self.logger.debug(text)
 
-        print("---")
         view_utils.add_to_history(self.logger, self.view, text)
-        print("2---")
         view_utils.filter(self.logger, self.view, text, view_utils.get_folding_type(self.logger, self.view, self.settings), view_utils.get_highlight_type(self.logger, self.view, self.settings))
 
+
+    def cancel():
+        pass
+        
 
 class RegexInputHandler(commands_override.TextInputHandler):
 
@@ -197,7 +201,9 @@ class RegexInputHandler(commands_override.TextInputHandler):
         if len(value) == 0 :
             return
         
-        filter_on_change = False # TODO : filter_on_change = self.settings.get('expression_prompt', {}).get('filter_on_change', False)
+        if self.settings.get('expression_prompt', {}).get('filter_on_change', False):
+            view_utils.filter(self.logger, self.view, value, view_utils.get_folding_type(self.logger, self.view, self.settings), view_utils.get_highlight_type(self.logger, self.view, self.settings))
+
         show_total_matches = self.settings.get('expression_prompt', {}).get('show_total_matches', False)
         
         return mini_html.create_preview(
@@ -210,6 +216,9 @@ class RegexInputHandler(commands_override.TextInputHandler):
             ]
         )
 
+    def next_input(self, args):
+        self.logger.debug(args)
+        return None
 
     def confirm(self, text):
         self.logger.debug(text)
@@ -218,9 +227,9 @@ class RegexInputHandler(commands_override.TextInputHandler):
         
         view_utils.filter(self.logger, self.view, text, view_utils.get_folding_type(self.logger, self.view, self.settings), view_utils.get_highlight_type(self.logger, self.view, self.settings))
 
-    def next_input(self, args):
-        self.logger.debug(args)
-        return None
+    def cancel():
+        pass
+        
 
 
 ##
