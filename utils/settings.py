@@ -1,7 +1,9 @@
 import sublime # type: ignore
 
 class SettingsManager:
-    def __init__(self, settings_file, logger=None):
+    def __init__(self, settings_file=None, logger=None):
+        if settings_file is None:
+            return
         self.settings_file = settings_file
         self.logger = logger
         self.settings_key = f"{self.__class__.__name__}_{id(self)}"

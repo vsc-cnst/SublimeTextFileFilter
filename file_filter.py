@@ -55,7 +55,7 @@ def plugin_unloaded() -> None:
 class FileFilterCommand(commands_override.TextCommand):
 
     def __init__(self, view):
-        super().__init__(view, SETTING_FILE_SETTINGS_NAME)
+        super().__init__(view=view,settings_file=SETTING_FILE_SETTINGS_NAME)
 
     def run(self, edit, option=None, history=None, regex=None):
         self.logger.debug(option, regex)
@@ -200,8 +200,10 @@ class RegexInputHandler(commands_override.TextInputHandler):
         self.logger.debug(value)
         if len(value) == 0 :
             return
-        
-        if self.settings.get('expression_prompt', {}).get('filter_on_change', False):
+
+        filter_on_change = self.settings.get('expression_prompt', {}).get('filter_on_change', False)
+
+        if filter_on_change:
             view_utils.filter(self.logger, self.view, value, view_utils.get_folding_type(self.logger, self.view, self.settings), view_utils.get_highlight_type(self.logger, self.view, self.settings))
 
         show_total_matches = self.settings.get('expression_prompt', {}).get('show_total_matches', False)
@@ -241,7 +243,7 @@ class RegexInputHandler(commands_override.TextInputHandler):
 class SetFoldingTypeCommand(commands_override.TextCommand):
 
     def __init__(self, view):
-        super().__init__(view, SETTING_FILE_SETTINGS_NAME)
+        super().__init__(view, settings_file=SETTING_FILE_SETTINGS_NAME)
 
     def run(self, edit, folding_types=None):
         self.logger.debug(folding_types=folding_types)
@@ -274,7 +276,7 @@ class FoldingTypesInputHandler(commands_override.ListInputHandler):
 class SetHighlightTypeCommand(commands_override.TextCommand):
 
     def __init__(self, view):
-        super().__init__(view, SETTING_FILE_SETTINGS_NAME)
+        super().__init__(view, settings_file=SETTING_FILE_SETTINGS_NAME)
 
     def run(self, edit, highlight_types=None):
         self.logger.debug(highlight_types=highlight_types)
