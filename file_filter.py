@@ -13,15 +13,6 @@ from .utils import view as view_utils
 from .utils import mini_html
 
 
-    
-##
-##
-## SETTINGS
-##
-##
-
-from .settings import KEY_MAP_CONTEXT_KEY_CLEAR
-
 ##
 ##
 ## LOGGING  
@@ -334,16 +325,16 @@ class ClearCommand(commands_override.WindowCommand):
 
 ##
 ##
-## -
+## Listener
 ##
 ##
 
 class FileFilterListener(sublime_plugin.EventListener):
 
     def on_query_context(self, view, key, operator, operand, match_all):
-        if key == KEY_MAP_CONTEXT_KEY_CLEAR:
+        if key == "file_filter.keymaps_context.clear":
             is_file_filter_active = view.settings().get(VIEW_SETTINGS_IS_FILTER_ACTIVE, False)
-            LOGGER.debug(f"key: '{KEY_MAP_CONTEXT_KEY_CLEAR}, returning '{VIEW_SETTINGS_IS_FILTER_ACTIVE} -> {is_file_filter_active }")
+            LOGGER.debug(f"key: '{key}, returning '{VIEW_SETTINGS_IS_FILTER_ACTIVE} -> {is_file_filter_active }")
             view_utils.clear(
                         LOGGER,
                         view,
