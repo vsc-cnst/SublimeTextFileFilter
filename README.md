@@ -1,119 +1,149 @@
 # File Filter Plugin for Sublime Text
 
 ## Overview
-This plugin allows you to filter file content using regular expressions (RegExp) — **it does not change the file content**.
+File Filter highlights regex matches and folds non-matching content without modifying the original file.
 
-Matches are highlighted, and text that does not match the RegExp will be folded.
-
-### Features
-
-- File Filtering using RegExp
-- Configurable predefined regular expressions
-- Supports multiline matching
-- Multiple Text Folding Options
-  - Adjust how content collapses around matches for better readability
-- Customizable Highlighting Styles
-  - Highlight matched regions using various styles for better readability
-
-### Installation
-
-1. From the `Command Palette`, run `Package Control: Install Package` command.
-2. In the opened packages list, find `FileFilter` package and install it
-
-### File Filter Command
-
-1. From the `Command Palette`, run `File Filter` command
-2. Write a RegExp in the prompt (the match may be multiline)
-3. The file will be filtered to show only the lines with matches
-    - To change the folding style, use the command `File Filter: Folding Style`
-    - To change the match areas highlight style, use the command `File Filter: Highlight Style`
-
-#### Regex flags
-
-You can use the `(?aiLmsux-imsx:...)` syntax to add flags.
-
-
-##### Example:
-using `(?:PYTHON)` as regex, filter will match lines with both `python` and `PYTHON`
-using `(?:PYTHON)outter` as regex, filter will match lines with both `pythonoutter` and `PYTHONoutter` 
-
-As this is a python plug, you can follow [python regex docs](https://docs.python.org/3/library/re.html#regular-expression-syntax) for detailed information.
+It is useful when you want to quickly isolate relevant lines or sections in large log files, source code, or text dumps.
 
 ![](gifs/FileFilter_Filter.gif)
 
-#### Regex flags
+## Features
 
-You can use the `(?aiLmsux-imsx:...)` syntax to add flags.
+- Regex-based filtering
+- Create filter based on text selection
+- Highlight styles for matches
+- Folding strategies for non-matching content
+- Favorite / preset filters
+- History
+
+## Installation
+
+1. Open the Command Palette.
+2. Run `Package Control: Install Package`.
+3. Search for `File Filter` and install it.
 
 
-##### Example:
-- using `(?:PYTHON)` as regex, filter will match lines with both `python` and `PYTHON` 
-- using `(?:PYTHON)outter` as regex, filter will match lines with both `pythonoutter` and `PYTHONoutter` 
+## Regex syntax
 
-As this is a python plug, you can follow [python regex docs](https://docs.python.org/3/library/re.html#regular-expression-syntax) for detailed information.
+For aditional information on valid syntax and options follow [python regex documentation](https://docs.python.org/3/library/re.html) 
+
+#### Flags:
+
+> Flags: use the [`(?aiLmsux-imsx:...)`](https://docs.python.org/3/library/re.html) syntax to add flags.
+
+- using `(?i:PYTHON)` as regex, filter will match lines with both `python` and `PYTHON`
+
+- using `PYTHON` (same as `(?:PYTHON)`) as regex, filter will match lines with `PYTHON`
+
+- using `(?:PYTHON)outter` as regex, filter will `PYTHONoutter` 
 
 
-### Folding Style Command
+## Commands
 
-Adjust how content collapses around matches for better readability.
+### File Filter Command
 
-1. From the `Command Palette`, run `File Filter: Folding Style` command.
+1. Open `Command Palette`, 
+2. Select `File Filter` command
+3. Select one of the optios
+   - New
+   - From Selected Text
+   - History
+   - Favorits
+   - Clear
+
+
+> #### Option: **`New`**
+
+Opens a regex prompt to create a new search pattern.
+
+User settings:
+
+- **`expression_prompt.filter_on_change`**: refreshes the filter while the regex text is being edited.
+
+
+> #### Option: **`From Selected Text`**
+
+Uses the current selection as the search pattern.
+
+User setting:
+- `option_from_selected_text.escape_selection` (`true` / `false`): escapes the selected text before using it as a literal pattern.
+
+> #### Option: **`History`**
+
+Restores a previously used regex from the current view history and applies it immediately.
+
+
+> #### Option: **`Favorites`**
+
+Applies a saved preset from the `favorits` list to the current view.
+
+User setting:
+- **`favorits`**: list of saved named regex presets.
+
+> #### Option: `Clear`
+
+Same as `Clear Command`
+
+User setting:
+ - **`option_command_on_clear.unfold_regions`** (`true` / `false`): unfolds hidden regions when clearing.
+ - **`option_command_on_clear.remove_highlights`** (**`true`** / **`false`**): removes highlighted matches.
+ - **`option_command_on_clear.center_viewport_on_carret`** (**`true`** / **`false`**): recenters the viewport on the caret.
+
+
+### Set Folding Style Command
 
 ![](gifs/FileFilter_FoldingStyle.gif)
 
-### Highlight Style Command
+Adjust how content collapses around matches for better readability.
+
+1. Open `Command Palette`, 
+2. Select `File Filter: Folding Style` command.
+
+User settings:
+
+
+- **`default_folding_style`**: Defines the default folding style
+  - `line`: Fold entire lines.
+  - `match_only`: Fold only the matched text.
+  - `before_only`: Fold text before the match.
+  - `after_only`: Fold text after the match.
+  - `highlight_only`: Highlight the matched text without folding.
+
+
+
+### Set Highlight Style Command
 
 Adjust how matched text is highlighted.
 
-1. From the `Command Palette`, run `File Filter: Highlight Style` command.
+1. Open `Command Palette`, 
+2. Select `File Filter: Highlight Style`
 
-![](gifs/FileFilter_HighlightTypes.gif)
+- **`default_highlight_style`**: Defines the default style for highlighting
+  - `outline`: Highlight with an outline, no fill.
+  - `solid`: Highlight with a solid fill, no outline.
+  - `underline_solid`: Highlight with a solid underline, no fill or outline.
+  - `underline_stippled`: Highlight with a stippled underline, no fill or outline.
+  - `underline_squiggly`: Highlight with a squiggly underline, no fill or outline.
+  - `none`: No highlighting.
 
-### Quick Panel Command
-
-1. From the `Command Palette`, run `File Filter: Quick Panel` command.
-2. A list of quick options will be displayed:
-    - `prompt`: same as File Filter command
-    - `clear`: clear all filter and highlights - same as exit
-    - Additional Predefined RegExp
-        - Settings defined options: the remaining of the list can be edited using the `File Filter: Edit Settings` command
-        - Add or remove additional predefined RegExp using by editing the `regex_list` property. Each item must be ['description', "regex string"] arrays
-3. Choosing an option immediately filters the file.
-
-![](gifs/FileFilter_QuickPanel.gif)
 
 ### Clear Command
 
 Clear all filters.
 
-1. From the `Command Palette`, run `File Filter: Clear` command.
+1. Open `Command Palette`, 
+2. Select `File Filter: Clear`
 
 
 ### Edit Settings Command
 
-1. From the `Command Palette`, run `File Filter: Edit Settings` command.
-2. Settings files will be shown.
+Opens `user settings` files.
 
-#### Configuration settings file options
+1. Open `Command Palette`, 
+2. Select `File Filter: Edit Settings` 
 
-- **`default_folding_style`**: Defines the default folding style
-  - **Possible Values**:
-    - `line`: Fold entire lines.
-    - `match_only`: Fold only the matched text.
-    - `before_only`: Fold text before the match.
-    - `after_only`: Fold text after the match.
-    - `highlight_only`: Highlight the matched text without folding.
 
-- **`default_highlight_style`**: Defines the default style for highlighting
-  - **Possible Values**:
-    - `outline`: Highlight with an outline, no fill.
-    - `solid`: Highlight with a solid fill, no outline.
-    - `underline_solid`: Highlight with a solid underline, no fill or outline.
-    - `underline_stippled`: Highlight with a stippled underline, no fill or outline.
-    - `underline_squiggly`: Highlight with a squiggly underline, no fill or outline.
-    - `none`: No highlighting.
-
-- **`expression_prompt.refresh_on_change`**: A boolean that determines whether to refresh file filter when prompt changes occur
+#### Other configuration settings file options
 
 - **`status_bar`**: Configuration options related to the status bar display.
   - **Properties**:
@@ -121,10 +151,4 @@ Clear all filters.
     - **`show_current_highlight_style`**: Boolean indicating if the current highlight style should be displayed.
     - **`show_total_matches`**: Boolean indicating if the total number of matches should be displayed.
 
-- **`on_clear_command_options`**: Configuration options for the clear command behavior.
-  - **Properties**:
-    - **`unfold_regions`**: Boolean determining whether to unfold regions when the clear command is issued.
-    - **`remove_highlights`**: Boolean determining whether to remove highlights when the clear command is issued.
-    - **`center_viewport_on_carret`**: Boolean determining whether to center the viewport on the caret when the clear command is issued.
 
-- **`regex_list`**: An array of regex patterns used for matching text. Each entry is an array containing two strings: a label and the corresponding regex pattern.
