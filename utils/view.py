@@ -1,4 +1,5 @@
-import sublime # type: ignore
+import sublime
+from .logging import CustomLogger
 from .utils import stringify
 
 from .enums import FoldingTypes, HighlightTypes
@@ -104,15 +105,13 @@ def clear(log, view: sublime.View, unfold_regions=True, remove_highlights=True, 
     view.settings().erase(VIEW_SETTINGS_IS_FILTER_ACTIVE)
 
 
-def filter(log, view: sublime.View, regex, folding_type, highlight_type):
-    print('1')
-    log.debug("filter", folding_type=folding_type,highlight_type=highlight_type,regex=regex)
-    print('2')
+def filter(log: CustomLogger, view: sublime.View, regex, folding_type, highlight_type):
+    log.info("start view filter")
+    log.info("filter", folding_type=folding_type,highlight_type=highlight_type,regex=regex)
 
     if not regex:
         log.warning("No regex")
         return
-    print('3')
 
     clear(log, view)
 
@@ -141,23 +140,23 @@ def filter(log, view: sublime.View, regex, folding_type, highlight_type):
         # fold lines with no match
         for fold in fold_regions:
 
-            log.debug(f'.current fold: {fold}.')
+            log.trace(f'.current fold: {fold}.')
             if fold == first_fold :
-                log.debug(f'is first fold')
+                log.trace(f'is first fold')
             if fold == last_fold :
-                log.debug(f'is last fold')
+                log.trace(f'is last fold')
 
             if fold.size() <= 0 or fold.begin() >= fold.end():
-                log.debug(f'Invalidfold size. continue..')
+                log.trace(f'Invalidfold size. continue..')
                 continue
 
             a = view.full_line(fold.begin())
             b = view.full_line(fold.end())
 
-            log.debug(f'line a: {a}, line b:{b}')
+            log.trace(f'line a: {a}, line b:{b}')
 
             if a == b:
-                log.debug(f'a == b. same line')
+                log.trace(f'a == b. same line')
                 first = sublime.Region(fold.begin(), fold.begin())
                 middle = fold
                 last = sublime.Region(fold.end(),fold.end()) 
@@ -166,7 +165,7 @@ def filter(log, view: sublime.View, regex, folding_type, highlight_type):
                 middle = sublime.Region(a.end(),b.begin())
                 last = sublime.Region(b.begin(),fold.end())  
 
-            log.debug(f'first {first}, middle {middle}, last {last}')
+            log.trace(f'first {first}, middle {middle}, last {last}')
 
             if folding_type == FoldingTypes.match_only:
 

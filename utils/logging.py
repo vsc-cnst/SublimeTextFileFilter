@@ -1,27 +1,42 @@
 import logging
-import os
+
+from .settings_manager import SettingsManager
 from .utils import stringify
 
-class CustomLogger(logging.Logger):
+class CustomLogger(logging.Logger, SettingsManager):
+
     
-    def __init__(self, name, level=logging.INFO):
+    def __init__(self, name, level=logging.WARN):
         super().__init__(name, level)
+        SettingsManager.__init__(self)
         self.info(f"[File Filter][CustomLogger] init")
         
-        formatter = logging.Formatter(
-            f"[FileFilter][%(levelname)3s][%(name)s.%(funcName)s():%(lineno)s]  %(message)s"
-        )
-
-        # Create and configure a StreamHandler
-        self.stream_handler = logging.StreamHandler()
-        self.stream_handler.setFormatter(formatter)
-        self.addHandler(self.stream_handler)
-
-        if not bool(os.environ.get('STFileFilterEnv')):
-            level = logging.ERROR
+        self.propagate = False
         
-        self.setLevel(level)
-        self.info(f"[File Filter] Creating logger with log level 'DEBUG' ({logging.DEBUG})")
+        if not self.handlers:
+            formatter = logging.Formatter(
+                f"[FileFilter][%(levelname)3s][%(name)s.%(funcName)s():%(lineno)s]  %(message)s"
+            )
+
+            # Create and configure a StreamHandler
+            self.stream_handler = logging.StreamHandler()
+            self.stream_handler.setFormatter(formatter)
+            self.addHandler(self.stream_handler)
+
+        self.setLevel(self.settings.get('log_level', level))
+
+    def load_settings(self):
+        super().load_settings()
+        lvl = self.settings.get('log_level', logging.WARN)
+        self.setLevel(lvl)
+
+    def setLevel(self, level=logging.WARN):
+        super().setLevel(level)
+        self.info(f"[File Filter] Creating logger with log level '{level}'")
+    
+    def trace(self, *args, **kwargs):
+        msg = stringify(*args, **kwargs)
+        super().log(level=1, msg=msg, stacklevel=2)
 
     def debug(self, *args, **kwargs):
         msg = stringify(*args, **kwargs)

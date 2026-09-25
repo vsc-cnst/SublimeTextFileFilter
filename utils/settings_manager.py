@@ -1,15 +1,20 @@
 import sublime # type: ignore
+from ..settings import SETTING_FILE_SETTINGS_NAME
 
 class SettingsManager:
-    def __init__(self, settings_file=None, logger=None):
+    def __init__(self, settings_file=SETTING_FILE_SETTINGS_NAME, logger=None):
+        
         if settings_file is None:
             return
+        
         self.settings_file = settings_file
-        self.logger = logger
+        self.logger = logger or ( None if not hasattr(self, 'logger') else self.logger)
+            
         self.settings_key = f"{self.__class__.__name__}_{id(self)}"
+        
         self.settings = sublime.load_settings(settings_file)
         self.settings.add_on_change(self.settings_key, self.reload_settings)
-        self.reload_settings()
+
 
     def reload_settings(self):
         """
@@ -20,6 +25,7 @@ class SettingsManager:
         """
         if self.logger:
             self.logger.info(f"Settings reloaded for {self.settings_key}")
+            
         self.settings = sublime.load_settings(self.settings_file)
 
     def __del__(self):

@@ -13,9 +13,10 @@ class Expression:
         self.name = name
         self.description = description
         self.type = type
-        self.pattern = self._process_pattern(pattern)
         self.color = color
         self.escape = escape
+        
+        self.pattern = self._process_pattern(pattern)
 
         self.logger.debug(f"Expression initialized with name: {self.name}, description: {self.description}, type: {self.type}, pattern: {self.pattern}")
 

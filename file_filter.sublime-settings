@@ -1,4 +1,5 @@
 {
+    "log_level": 10,
     "escape_key_action": "none/clear",
     "global_regex_flags": "gi",
     "default_folding_type": "line",

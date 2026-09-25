@@ -2,6 +2,8 @@ import logging
 import sublime_plugin # type: ignore
 import re
 
+from .utils.expression import Expression
+
 from .utils import commands_override
 
 from .utils.logging import CustomLogger
@@ -10,6 +12,7 @@ from .utils.view  import VIEW_SETTINGS_CURRENT_REGEX, VIEW_SETTINGS_REGEX_HISTOR
 from .utils import view as view_utils
 from .utils import mini_html
 
+
     
 ##
 ##
@@ -17,9 +20,7 @@ from .utils import mini_html
 ##
 ##
 
-SETTING_FILE_SETTINGS_NAME = 'file_filter.sublime-settings'
-
-KEY_MAP_CONTEXT_KEY_CLEAR = "file_filter.keymaps_context.clear"
+from .settings import KEY_MAP_CONTEXT_KEY_CLEAR
 
 ##
 ##
@@ -55,14 +56,14 @@ def plugin_unloaded() -> None:
 class FileFilterCommand(commands_override.TextCommand):
 
     def __init__(self, view):
-        super().__init__(view=view,settings_file=SETTING_FILE_SETTINGS_NAME)
+        super().__init__(view=view)
 
-    def run(self, edit, option=None, history=None, regex=None):
-        self.logger.debug(option, regex)
+    def run(self, edit, option=None, history=None, regex=None, favorites=None):
+        self.logger.debug(option, edit=edit, option=option, history=history, regex=regex, favorites=favorites)
 
     def input(self, args):
         self.logger.debug(args)
-        return OptionsInputHandler(self.view, self.settings_file, self.logger)
+        return OptionsInputHandler(self.view, self.logger)
 
 class OptionsInputHandler(commands_override.ListInputHandler):
 
@@ -85,16 +86,16 @@ class OptionsInputHandler(commands_override.ListInputHandler):
         selected_option = args.get('option')
 
         if selected_option == "new":
-            return RegexInputHandler(self.view, self.settings_file, self.logger)
+            return RegexInputHandler(self.view, self.logger)
         if selected_option == "history":
-            return HistoryInputHandler(self.view, self.settings_file, self.logger)
+            return HistoryInputHandler(self.view, self.logger)
         if selected_option == "from_selection":
             from_selection_settings = self.settings.get('option_from_selected_text', {})
             escape = from_selection_settings["escape_selection"] or False
             text = self.view.substr(self.view.sel()[0])
-            return RegexInputHandler(self.view, self.settings_file, self.logger, re.escape(text or "") if escape else text)
+            return RegexInputHandler(self.view, self.logger, re.escape(text or "") if escape else text)
         if selected_option == "favorites":
-            return FavoritsInputHandler(self.view, self.settings_file, self.logger)
+            return FavoritsInputHandler(self.view, self.logger)
         if selected_option == "clear":
             clear_settings = self.settings.get('option_command_on_clear', {})
             view_utils.clear(
@@ -108,8 +109,8 @@ class OptionsInputHandler(commands_override.ListInputHandler):
 
 class HistoryInputHandler(commands_override.ListInputHandler):
 
-    def __init__(self, view, settings_file, logger):
-        super().__init__(view, settings_file, logger)
+    def __init__(self, view, logger):
+        super().__init__(view, logger)
 
         self.history = view.settings().get(VIEW_SETTINGS_REGEX_HISTORY, [])
 
@@ -143,33 +144,39 @@ class HistoryInputHandler(commands_override.ListInputHandler):
 
         view_utils.filter(self.logger, self.view, text, view_utils.get_folding_type(self.logger, self.view, self.settings), view_utils.get_highlight_type(self.logger, self.view, self.settings))
 
-    def cancel():
+    def cancel(self):
         pass
 
 class FavoritsInputHandler(commands_override.ListInputHandler):
     
     def name(self):
+        self.logger.debug("favorites")
         return "favorites"
 
     def list_items(self):
         favorits = self.settings.get('favorits', [])
-        return [(f.get('name', ""), f.get('expression', "")) for f in favorits]
+        favoritsExp = [Expression.new(f) for f in favorits]
+
+        self.logger.debug(favorits)
+        self.logger.debug(favoritsExp)
+        return [(exp.name, exp.pattern) for exp in favoritsExp]
 
     def confirm(self, text):
-        self.logger.debug(text)
+        self.logger.info(text)
 
         view_utils.add_to_history(self.logger, self.view, text)
+
         view_utils.filter(self.logger, self.view, text, view_utils.get_folding_type(self.logger, self.view, self.settings), view_utils.get_highlight_type(self.logger, self.view, self.settings))
 
 
-    def cancel():
+    def cancel(self):
         pass
         
 
 class RegexInputHandler(commands_override.TextInputHandler):
 
-    def __init__(self, view, settings_file, logger, filter=None):
-        super().__init__(view, settings_file, logger)
+    def __init__(self, view, logger, filter=None):
+        super().__init__(view, logger)
        
         self.global_regex_flags = self.settings.get('global_regex_flags', "")
         self.filter = filter or view.settings().get(VIEW_SETTINGS_CURRENT_REGEX, None)
@@ -229,7 +236,7 @@ class RegexInputHandler(commands_override.TextInputHandler):
         
         view_utils.filter(self.logger, self.view, text, view_utils.get_folding_type(self.logger, self.view, self.settings), view_utils.get_highlight_type(self.logger, self.view, self.settings))
 
-    def cancel():
+    def cancel(self):
         pass
         
 
@@ -243,14 +250,14 @@ class RegexInputHandler(commands_override.TextInputHandler):
 class SetFoldingTypeCommand(commands_override.TextCommand):
 
     def __init__(self, view):
-        super().__init__(view, settings_file=SETTING_FILE_SETTINGS_NAME)
+        super().__init__(view)
 
     def run(self, edit, folding_types=None):
         self.logger.debug(folding_types=folding_types)
 
     def input(self, args):
         self.logger.debug(args)
-        return FoldingTypesInputHandler(self.view, self.settings_file, self.logger)
+        return FoldingTypesInputHandler(self.view, self.logger)
 
 class FoldingTypesInputHandler(commands_override.ListInputHandler):
 
@@ -276,14 +283,14 @@ class FoldingTypesInputHandler(commands_override.ListInputHandler):
 class SetHighlightTypeCommand(commands_override.TextCommand):
 
     def __init__(self, view):
-        super().__init__(view, settings_file=SETTING_FILE_SETTINGS_NAME)
+        super().__init__(view)
 
     def run(self, edit, highlight_types=None):
         self.logger.debug(highlight_types=highlight_types)
 
     def input(self, args):
         self.logger.debug(args)
-        return HighlightTypesInputHandler(self.view, self.settings_file, self.logger)
+        return HighlightTypesInputHandler(self.view, self.logger)
 
 class HighlightTypesInputHandler(commands_override.ListInputHandler):
 
@@ -308,7 +315,7 @@ class HighlightTypesInputHandler(commands_override.ListInputHandler):
 class ClearCommand(commands_override.WindowCommand):
 
     def __init__(self, window):
-        super().__init__(window, SETTING_FILE_SETTINGS_NAME)
+        super().__init__(window)
 
         self.view = self.window.active_view()
 
@@ -337,5 +344,12 @@ class FileFilterListener(sublime_plugin.EventListener):
         if key == KEY_MAP_CONTEXT_KEY_CLEAR:
             is_file_filter_active = view.settings().get(VIEW_SETTINGS_IS_FILTER_ACTIVE, False)
             LOGGER.debug(f"key: '{KEY_MAP_CONTEXT_KEY_CLEAR}, returning '{VIEW_SETTINGS_IS_FILTER_ACTIVE} -> {is_file_filter_active }")
+            view_utils.clear(
+                        LOGGER,
+                        view,
+                        # unfold_regions = clear_settings.get('unfold_regions', True),
+                        # remove_highlights = clear_settings.get('remove_highlights', True),
+                        # center_viewport_on_carret = clear_settings.get('center_viewport_on_carret', True),
+                    )
             return is_file_filter_active
         return None

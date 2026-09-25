@@ -3,37 +3,36 @@ import logging
 import sublime # type: ignore
 import sublime_plugin # type: ignore
 
-from .settings import SettingsManager
-
+from .logging import CustomLogger # type: ignore
+from .settings_manager import SettingsManager
+from ..settings import SETTING_FILE_SETTINGS_NAME
 
 class WindowCommand(sublime_plugin.WindowCommand, SettingsManager):
     
-    def __init__(self, window, settings_file):
+    def __init__(self, window):
         self.window = window
-        self.settings_file = settings_file
 
         self.logger = logging.getLogger(f"{self.__class__.__name__}")
 
         sublime_plugin.WindowCommand.__init__(self, window)
         SettingsManager.__init__(
             self,
-            settings_file=settings_file,
+            settings_file=SETTING_FILE_SETTINGS_NAME,
             logger=self.logger
         )
 
 
 class TextCommand(sublime_plugin.TextCommand, SettingsManager):
 
-    def __init__(self, view, settings_file):
+    def __init__(self, view):
         self.view = view
-        self.settings_file = settings_file
 
         self.logger = logging.getLogger(f"{self.__class__.__name__}")
 
         sublime_plugin.TextCommand.__init__(self, view)
         SettingsManager.__init__(
             self,
-            settings_file=settings_file,
+            settings_file=SETTING_FILE_SETTINGS_NAME,
             logger=self.logger
         )
 
@@ -41,9 +40,8 @@ class TextCommand(sublime_plugin.TextCommand, SettingsManager):
 
 class ListInputHandler(sublime_plugin.ListInputHandler, SettingsManager):
 
-    def __init__(self, view, settings_file, logger=None):
+    def __init__(self, view, logger:CustomLogger =None):
         self.view = view
-        self.settings_file = settings_file
         
         logger_name = "" if not logger else logger.name
         self.logger = logging.getLogger(f"{logger_name}.{self.__class__.__name__}")
@@ -51,23 +49,17 @@ class ListInputHandler(sublime_plugin.ListInputHandler, SettingsManager):
         sublime_plugin.ListInputHandler.__init__(self)
         SettingsManager.__init__(
             self,
-            settings_file=settings_file,
+            settings_file=SETTING_FILE_SETTINGS_NAME,
             logger=self.logger
         )
 
-
-            
-
-
-
 class TextInputHandler(sublime_plugin.TextInputHandler, SettingsManager):
 
-    def __init__(self, view, settings_file, logger=None):
+    def __init__(self, view, logger=None):
         self.view = view
-        self.settings_file = settings_file
         
         logger_name = "" if not logger else logger.name
         self.logger = logging.getLogger(f"{logger_name}.{self.__class__.__name__}")
         
         sublime_plugin.TextInputHandler.__init__(self)
-        SettingsManager.__init__(self, settings_file=settings_file, logger=self.logger)
+        SettingsManager.__init__(self, settings_file=SETTING_FILE_SETTINGS_NAME, logger=self.logger)
