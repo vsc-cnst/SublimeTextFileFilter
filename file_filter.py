@@ -228,7 +228,7 @@ class FileFilter(sublime_plugin.WindowCommand):
         self.view.settings().set(VIEW_SETTINGS_CURRENT_FOLDING_TYPE, self.folding_type.name)
 
     def command_set_highlight_type(self, highlight_type):
-        set_highlight_type(highlight_type)
+        self.set_highlight_type(highlight_type)
         self.apply()
 
     def set_highlight_type(self, highlight_type):
