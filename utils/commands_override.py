@@ -9,6 +9,9 @@ from .settings import SettingsManager
 class WindowCommand(sublime_plugin.WindowCommand, SettingsManager):
     
     def __init__(self, window, settings_file):
+        self.window = window
+        self.settings_file = settings_file
+
         self.logger = logging.getLogger(f"{self.__class__.__name__}")
 
         sublime_plugin.WindowCommand.__init__(self, window)
@@ -22,6 +25,9 @@ class WindowCommand(sublime_plugin.WindowCommand, SettingsManager):
 class TextCommand(sublime_plugin.TextCommand, SettingsManager):
 
     def __init__(self, view, settings_file):
+        self.view = view
+        self.settings_file = settings_file
+
         self.logger = logging.getLogger(f"{self.__class__.__name__}")
 
         sublime_plugin.TextCommand.__init__(self, view)
@@ -36,6 +42,9 @@ class TextCommand(sublime_plugin.TextCommand, SettingsManager):
 class ListInputHandler(sublime_plugin.ListInputHandler, SettingsManager):
 
     def __init__(self, view, settings_file, logger=None):
+        self.view = view
+        self.settings_file = settings_file
+        
         logger_name = "" if not logger else logger.name
         self.logger = logging.getLogger(f"{logger_name}.{self.__class__.__name__}")
 
@@ -54,8 +63,8 @@ class ListInputHandler(sublime_plugin.ListInputHandler, SettingsManager):
 class TextInputHandler(sublime_plugin.TextInputHandler, SettingsManager):
 
     def __init__(self, view, settings_file, logger=None):
-
         self.view = view
+        self.settings_file = settings_file
         
         logger_name = "" if not logger else logger.name
         self.logger = logging.getLogger(f"{logger_name}.{self.__class__.__name__}")
