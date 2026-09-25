@@ -1,5 +1,6 @@
-import sublime
-from .logging import CustomLogger
+import sublime # type: ignore
+from .settings_manager import SettingsSnapshot
+from .custom_logger import CustomLogger
 from .utils import stringify
 
 from .enums import FoldingTypes, HighlightTypes
@@ -37,7 +38,7 @@ def get_folding_type(log, view: sublime.View, settings: sublime.Settings) -> Fol
     return set_folding_type(log, view, settings)
 
 
-def set_folding_type(log, view: sublime.View, settings: sublime.Settings, folding_type=None) -> FoldingTypes:
+def set_folding_type(log, view: sublime.View, settings: SettingsSnapshot, folding_type=None) -> FoldingTypes:
     log.debug(folding_type)
     
     try:
@@ -51,7 +52,8 @@ def set_folding_type(log, view: sublime.View, settings: sublime.Settings, foldin
         else:
             raise ValueError("Invalid folding_type format")
     except Exception as e:
-        folding_type = FoldingTypes[view.settings().get(VIEW_SETTINGS_CURRENT_FOLDING_TYPE, settings.get('default_folding_type', FoldingTypes.line.name))]
+        default_folding_type = settings.defaults.folding.type
+        folding_type = FoldingTypes[view.settings().get(VIEW_SETTINGS_CURRENT_FOLDING_TYPE, default_folding_type)]
 
     log.info(f"folding_type set to '{folding_type.name}'")
     view.settings().set(VIEW_SETTINGS_CURRENT_FOLDING_TYPE, folding_type.name)
@@ -64,7 +66,7 @@ def get_highlight_type(log, view: sublime.View, settings: sublime.Settings) -> H
     return set_highlight_type(log, view, settings)
 
 
-def set_highlight_type(log, view: sublime.View, settings: sublime.Settings, highlight_type=None) -> HighlightTypes:
+def set_highlight_type(log, view: sublime.View, settings: SettingsSnapshot, highlight_type=None) -> HighlightTypes:
     log.debug(settings, highlight_type)
     
     try:
@@ -79,7 +81,10 @@ def set_highlight_type(log, view: sublime.View, settings: sublime.Settings, high
             raise ValueError("Invalid highlight_type format")
 
     except Exception as e:
-        highlight_type = HighlightTypes[view.settings().get(VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE, settings.get('default_highlight', {}).get('type', HighlightTypes.solid.name))]
+        highlight_type = HighlightTypes[
+            view.settings().get(VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE,
+            settings.defaults.highlight.type)
+        ]
 
     log.info(f"highlight_type set to '{highlight_type.name}'")
     view.settings().set(VIEW_SETTINGS_CURRENT_HIGHLIGHT_TYPE, highlight_type.name)

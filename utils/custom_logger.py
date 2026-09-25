@@ -3,12 +3,16 @@ import logging
 from .settings_manager import SettingsManager
 from .utils import stringify
 
+TRACE = 5
+
+
 class CustomLogger(logging.Logger, SettingsManager):
 
     
     def __init__(self, name, level=logging.WARN):
-        super().__init__(name, level)
+        logging.Logger.__init__(self, name, level)
         SettingsManager.__init__(self)
+
         self.info(f"[File Filter][CustomLogger] init")
         
         self.propagate = False
@@ -23,20 +27,23 @@ class CustomLogger(logging.Logger, SettingsManager):
             self.stream_handler.setFormatter(formatter)
             self.addHandler(self.stream_handler)
 
-        self.setLevel(self.settings.get('log_level', level))
+        self.setLevel(self.settings.global_settings.log_level)
 
-    def load_settings(self):
-        super().load_settings()
-        lvl = self.settings.get('log_level', logging.WARN)
-        self.setLevel(lvl)
+    def reload_settings(self):
+        super().reload_settings()
+        self.setLevel(self.settings.global_settings.log_level)
 
-    def setLevel(self, level=logging.WARN):
+    def setLevel(self, level=logging.WARNING):
+        if hasattr(self, 'settings'):
+            level = self.settings.global_settings.log_level
         super().setLevel(level)
-        self.info(f"[File Filter] Creating logger with log level '{level}'")
+
+        self.info(f"Setting log_level to '{level}'")
+                
     
     def trace(self, *args, **kwargs):
         msg = stringify(*args, **kwargs)
-        super().log(level=1, msg=msg, stacklevel=2)
+        super().log(level=TRACE, msg=msg, stacklevel=2)
 
     def debug(self, *args, **kwargs):
         msg = stringify(*args, **kwargs)

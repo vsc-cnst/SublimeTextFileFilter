@@ -6,7 +6,7 @@ from .utils.expression import Expression
 
 from .utils import commands_override
 
-from .utils.logging import CustomLogger
+from .utils.custom_logger import TRACE, CustomLogger
 from .utils.enums import FoldingTypes, HighlightTypes
 from .utils.view  import VIEW_SETTINGS_CURRENT_REGEX, VIEW_SETTINGS_REGEX_HISTORY, VIEW_SETTINGS_IS_FILTER_ACTIVE
 from .utils import view as view_utils
@@ -30,6 +30,7 @@ from .settings import KEY_MAP_CONTEXT_KEY_CLEAR
 
 # log level defined in CustomLogger
 logging.setLoggerClass(CustomLogger)
+logging.addLevelName(TRACE, "TRACE")
 LOGGER = logging.getLogger('FileFilter')
 
 
@@ -90,20 +91,19 @@ class OptionsInputHandler(commands_override.ListInputHandler):
         if selected_option == "history":
             return HistoryInputHandler(self.view, self.logger)
         if selected_option == "from_selection":
-            from_selection_settings = self.settings.get('option_from_selected_text', {})
-            escape = from_selection_settings["escape_selection"] or False
+            escape = self.settings.commands.from_selection
             text = self.view.substr(self.view.sel()[0])
             return RegexInputHandler(self.view, self.logger, re.escape(text or "") if escape else text)
         if selected_option == "favorites":
             return FavoritsInputHandler(self.view, self.logger)
         if selected_option == "clear":
-            clear_settings = self.settings.get('option_command_on_clear', {})
+            clear_settings = self.settings.commands.clear
             view_utils.clear(
                 self.logger,
                 self.view,
-                unfold_regions = clear_settings.get('unfold_regions', True),
-                remove_highlights = clear_settings.get('remove_highlights', True),
-                center_viewport_on_carret = clear_settings.get('center_viewport_on_carret', True),
+                unfold_regions = clear_settings.unfold_regions,
+                remove_highlights = clear_settings.remove_highlights,
+                center_viewport_on_carret = clear_settings.center_viewport_on_carret,
             )
         return None
 
@@ -154,10 +154,11 @@ class FavoritsInputHandler(commands_override.ListInputHandler):
         return "favorites"
 
     def list_items(self):
-        favorits = self.settings.get('favorits', [])
+        favorits = self.settings.favorits
+        self.logger.debug(favorits)
+        
         favoritsExp = [Expression.new(f) for f in favorits]
 
-        self.logger.debug(favorits)
         self.logger.debug(favoritsExp)
         return [(exp.name, exp.pattern) for exp in favoritsExp]
 
@@ -178,7 +179,7 @@ class RegexInputHandler(commands_override.TextInputHandler):
     def __init__(self, view, logger, filter=None):
         super().__init__(view, logger)
        
-        self.global_regex_flags = self.settings.get('global_regex_flags', "")
+        self.global_regex_flags = self.settings.global_settings.global_regex_flags
         self.filter = filter or view.settings().get(VIEW_SETTINGS_CURRENT_REGEX, None)
         self.history = view.settings().get(VIEW_SETTINGS_REGEX_HISTORY, [])
 
@@ -208,13 +209,12 @@ class RegexInputHandler(commands_override.TextInputHandler):
         if len(value) == 0 :
             return
 
-        filter_on_change = self.settings.get('expression_prompt', {}).get('filter_on_change', False)
+        filter_on_change = self.settings.commands.new.filter_on_change
+        show_total_matches = self.settings.commands.new.show_total_matches
 
         if filter_on_change:
             view_utils.filter(self.logger, self.view, value, view_utils.get_folding_type(self.logger, self.view, self.settings), view_utils.get_highlight_type(self.logger, self.view, self.settings))
 
-        show_total_matches = self.settings.get('expression_prompt', {}).get('show_total_matches', False)
-        
         return mini_html.create_preview(
             ("Total matches", len(self.view.find_all(value))) if show_total_matches else None,
             [
@@ -322,14 +322,14 @@ class ClearCommand(commands_override.WindowCommand):
     def run(self):
         super().run()
         
-        clear_settings = self.settings.get('option_command_on_clear', {})
+        clear_settings = self.settings.commands.clear
 
         view_utils.clear(
             self.logger,
             self.view,
-            unfold_regions = clear_settings.get('unfold_regions', True),
-            remove_highlights = clear_settings.get('remove_highlights', True),
-            center_viewport_on_carret = clear_settings.get('center_viewport_on_carret', True),
+            unfold_regions = clear_settings.unfold_regions,
+            remove_highlights = clear_settings.remove_highlights,
+            center_viewport_on_carret = clear_settings.center_viewport_on_carret,
         )
 
 ##

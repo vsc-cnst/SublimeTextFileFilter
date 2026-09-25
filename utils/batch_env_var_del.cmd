@@ -1,1 +1,0 @@
-REG delete "HKCU\Environment" /F /V "STFileFilterEnv"

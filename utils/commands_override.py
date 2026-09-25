@@ -3,7 +3,7 @@ import logging
 import sublime # type: ignore
 import sublime_plugin # type: ignore
 
-from .logging import CustomLogger # type: ignore
+from .custom_logger import CustomLogger # type: ignore
 from .settings_manager import SettingsManager
 from ..settings import SETTING_FILE_SETTINGS_NAME
 
