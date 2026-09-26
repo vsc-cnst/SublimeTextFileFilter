@@ -1,30 +1,49 @@
 {
-    "default_folding_style": "line",
-    "default_highlight_style": "solid",
-    "expression_prompt": {
-        "refresh_on_change": false
+    "global":{
+        "log_level": 30,
+        "global_regex_flags": "gi",
     },
-    "status_bar":
-    {
-        "show_current_folding_style": true,
-        "show_current_highlight_style": true,
-        "show_total_matches": true
+    "defaults":{
+        "highlight":{
+            "type": "solid",
+            "color": "white"
+        },
+        "folding": {
+            "type": "line",
+        },
+    },  
+    "commands":{
+        "new":{
+            "filter_on_change": true,
+            "show_total_matches": true
+        },
+        "from_selection":{
+            "escape_selection": true
+        },
+        "history":{
+
+        },
+        "favorites":{
+
+        },
+        "clear":{
+            "center_viewport_on_carret": true,
+            "remove_highlights": true,
+            "unfold_regions": true
+        },
     },
-    "on_clear_command_options":
-    {
-        "unfold_regions": true,
-        "remove_highlights": true,
-        "center_viewport_on_carret": true
-    },
-    "regex_list":
-    [
-        [
-            "[INF]",
-            "\\[INF]"
-        ],
-        [
-            "Starting w/ Date Time",
-            "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\["
-        ]
+    "favorits": [
+        {   
+            "code": "logs-info",
+            "name": "logs info",
+            "pattern": "\\[INF]",
+        },
+        {
+            "code": "",
+            "name": "Starting w/ Date Time",
+            "pattern": "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\[",
+        }
+    ],
+    "expressions": [
     ]
 }

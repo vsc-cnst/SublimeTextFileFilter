@@ -1,101 +1,35 @@
 import sys
-import os
-
-import sublime
-import sublime_plugin
 import unittest
-from unittest import TestCase
-from unittest.mock import patch, MagicMock
-import itertools
-import json
+from types import SimpleNamespace
+from unittest.mock import MagicMock, patch
 
-file_filter = sys.modules["File Filter.file_filter"]
-FileFilter = file_filter.FileFilter
-VIEW_SETTINGS_HIGHLIGHTED_REGIONS = file_filter.VIEW_SETTINGS_HIGHLIGHTED_REGIONS
+File_Filter = sys.modules["File Filter.file_filter"]
+ClearCommand = File_Filter.ClearCommand
 
-class TestCommandFilter_Clear(TestCase):
 
-    @classmethod  
-    def setUpClass(self):
+class TestClearCommand(unittest.TestCase):
 
-        package_dir_path = os.path.dirname(os.path.dirname(__file__))
-        tests_dir_path = os.path.dirname(__file__)
-
-        self.file = open(os.path.join(tests_dir_path, 'fixtures', "windows.example.log")).read()
-
-    @classmethod
     def setUp(self):
-        
-        self.window = sublime.active_window()
-        self.view = self.window.new_file()
-        self.window.focus_view(self.view)
+        self.window = MagicMock()
+        self.view = MagicMock()
+        self.window.active_view.return_value = self.view
 
-        self.view.run_command("insert", {"characters": self.file})
-        self.vie_size = self.view.size()
+        self.command = ClearCommand(self.window)
+        self.command.logger = MagicMock()
 
+    @patch.object(File_Filter.view_utils, "clear")
+    def test_run_forwards_configured_options(self, mock_clear):
+        self.command.settings.commands.clear = SimpleNamespace(
+            unfold_regions=False,
+            remove_highlights=True,
+            center_viewport_on_carret=False,
+        )
 
-    @classmethod
-    def tearDown(self):
-        if self.view:
-            self.view.set_scratch(True)
-            self.window.focus_view(self.view)
-            self.view.window().run_command("close_file")
-
-    def test_UnfoldYes_RmvHighlightsYes_CenterOnCarretYes(self):
-        self.run_it(True, True, True)
-
-    def test_UnfoldYes_RmvHighlightsYes_CenterOnCarretNo(self):
-        self.run_it(True, True, False)
-
-    def test_UnfoldYes_RmvHighlightsNo_CenterOnCarretYes(self):
-        self.run_it(True, False, True)
-
-    def test_UnfoldYes_RmvHighlightsNo_CenterOnCarretNo(self):
-        self.run_it(True, False, False)
-
-    def test_UnfoldNo_RmvHighlightsYes_CenterOnCarretYes(self):
-        self.run_it(False, True, True)
-
-    def test_UnfoldNo_RmvHighlightsYes_CenterOnCarretNo(self):
-        self.run_it(False, True, False)
-
-    def test_UnfoldNo_RmvHighlightsNo_CenterOnCarretYes(self):
-        self.run_it(False, False, True)
-
-    def test_visible_region(self):
-        self.assertEqual(sublime.Region(0,6012), self.view.visible_region())
-
-    def test_UnfoldNo_RmvHighlightsNo_CenterOnCarretNo(self):
-        self.run_it(False, False, False)
-
-    def run_it(self, unfold_regions, remove_highlights, center_viewport_on_carret):
-
-        desired_carret_idx = self.view.size();
-        self.view.sel().clear()
-        self.view.sel().add(sublime.Region(desired_carret_idx))
-
-        command_filter = FileFilter(self.window)
-        command_filter.run()
-        command_filter.set_regex(r"Session: 30546354_29")
-        
-        self.assertFalse(self.view.visible_region().contains(desired_carret_idx), "Carret position cannot be visible at test start")
-
-        command_filter.apply()
-
-        initial_highlights_count = len(self.view.get_regions(VIEW_SETTINGS_HIGHLIGHTED_REGIONS))
-        self.assertTrue(self.view.visible_region().contains(desired_carret_idx), "Carret position MUST be visible after filter run")
-        self.assertFalse(initial_highlights_count == 0, "No highlights at test start")
-        
-        command_filter.clear(unfold_regions, remove_highlights, center_viewport_on_carret)
-
-        if unfold_regions and center_viewport_on_carret == False:
-            self.assertFalse(self.view.visible_region().contains(desired_carret_idx), f"Carret position CAN NOT be visible after run command clear when unfold_regions=='{unfold_regions}'' and center_viewport_on_carret=='{center_viewport_on_carret}'")
-        else:
-            self.assertTrue(self.view.visible_region().contains(desired_carret_idx), f"Carret position MUST be visible after run command clear when unfold_regions=='{unfold_regions}'' and center_viewport_on_carret=='{center_viewport_on_carret}'")
-
-        highlights_count = len(self.view.get_regions(VIEW_SETTINGS_HIGHLIGHTED_REGIONS))
-        if remove_highlights:
-            self.assertTrue(highlights_count == 0, "Not all were removed highlights")
-        else:
-            self.assertTrue(highlights_count == initial_highlights_count, f"Final highlights count({highlights_count}) does not match initial count ({initial_highlights_count})")
-
+        self.command.run()
+        mock_clear.assert_called_once_with(
+            self.command.logger,
+            self.view,
+            unfold_regions=False,
+            remove_highlights=True,
+            center_viewport_on_carret=False,
+        )

@@ -5,7 +5,7 @@ name: Teste File Filter package
 
 on:
   push:
-    branches: [ "main", "git-actions" ]
+    branches: [ "main", "v3" ]
   pull_request:
     branches: [ "main" ]
   
