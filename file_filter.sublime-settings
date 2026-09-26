@@ -34,18 +34,13 @@
     },
     "favorits": [
         {   
+            "code": "logs-info",
             "name": "logs info",
-            "description": "logs info",
             "pattern": "\\[INF]",
         },
-        {   
-            "name": "ABC",
-            "description": "logs info",
-            "pattern": "ABC",
-        },
         {
+            "code": "",
             "name": "Starting w/ Date Time",
-            "description": "",
             "pattern": "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\[",
         }
     ],
