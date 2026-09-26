@@ -1,0 +1,30 @@
+Hi!
+
+Thanks for using File Filter!
+
+Version 3 is coming soon, with a new format for the Sublime Text settings.
+If you've customized your settings, you'll need to move them to the new format.
+No worries: your configuration won't be lost, and this is a straightforward update.
+
+If you haven't changed the default settings, there's nothing you need to do.
+Not sure whether you've customized them? From command palette select 'File Filter: Edit Settings' to check.
+
+Use the examples below to migrate your settings:
+
+SETTING-BY-SETTING MAPPING (source setting goes to target path):
+
+    "default_folding_style": goes to "defaults.folding.type",
+    "default_highlight_style": goes to "defaults.highlight.type",
+    "expression_prompt.refresh_on_change": goes to "commands.new.filter_on_change",
+    "status_bar.show_total_matches": goes to "commands.new.show_total_matches",
+    "on_clear_command_options.center_viewport_on_carret": goes to "commands.clear.center_viewport_on_carret",
+    "on_clear_command_options.remove_highlights": goes to "commands.clear.remove_highlights",
+    "on_clear_command_options.unfold_regions": goes to "commands.clear.unfold_regions",
+
+    "regex_list" is now "favorits" 
+
+
+For any doubt or issue please open an issue in the repo at
+https://github.com/vsc-cnst/SublimeTextFileFilter/issues
+
+Hope you enjoy version 3!
