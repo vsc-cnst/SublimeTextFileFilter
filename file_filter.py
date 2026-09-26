@@ -210,7 +210,7 @@ class RegexInputHandler(commands_override.TextInputHandler):
             ("Total matches", len(self.view.find_all(value))) if show_total_matches else None,
             [
                 ("<i>Show total matches</i>", "off") if not show_total_matches else None,
-                ("Filter on change", "on" if filter_on_change else "off") if not filter_on_change else None,
+                ("Filter on change", "on" if filter_on_change else "off"),
                 ('Folding', view_utils.get_folding_type(self.logger, self.view, self.settings).value),
                 ('Highlight',view_utils.get_highlight_type(self.logger, self.view, self.settings).description)
             ]

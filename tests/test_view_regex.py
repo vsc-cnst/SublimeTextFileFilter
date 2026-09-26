@@ -1,19 +1,13 @@
 import sys
 import unittest
 import sublime
-import logging
 from unittest.mock import MagicMock
 
-enums = sys.modules["File Filter.utils.enums"]
 view_utils = sys.modules["File Filter.utils.view"]
-
-FoldingTypes = enums.FoldingTypes
-HighlightTypes = enums.HighlightTypes
 
 
 class TestViewRegex(unittest.TestCase):
 
-    @classmethod
     def setUp(self):
         self.window = sublime.active_window()
         self.view = self.window.new_file()
@@ -21,7 +15,6 @@ class TestViewRegex(unittest.TestCase):
   
         self.mock_logger = MagicMock()
 
-    @classmethod
     def tearDown(self):
 
         if self.view:

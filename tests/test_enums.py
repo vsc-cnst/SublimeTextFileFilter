@@ -1,11 +1,6 @@
-import sys
-import os
-
 import sublime
-
 import unittest
-from unittest import TestCase
-from unittest.mock import patch
+import sys
 
 enums = sys.modules["File Filter.utils.enums"]
 
@@ -13,18 +8,17 @@ FoldingTypes = enums.FoldingTypes
 HighlightTypes = enums.HighlightTypes
 
 
-class TestCommandFilter_File1(unittest.TestCase):
+class TestFoldingTypes(unittest.TestCase):
 
     def test_members(self):
         expected_members = ['line', 'match_only', 'before_only', 'after_only', 'highlight_only']
         self.assertEqual([member.name for member in FoldingTypes], expected_members)
     
     def test_all_members(self):
-        expected_members = ['line', 'match_only', 'before_only', 'after_only', 'highlight_only']
-        self.assertEqual(FoldingTypes.all_members(), expected_members)
+        self.assertEqual(FoldingTypes.all_members(), list(FoldingTypes))
 
-    def test_descriptions(self):
-        expected_members = ['Line','Match only','Fold before','Fold after','Highlight only']
+    def test_all_values(self):
+        expected_values = ['Line', 'Match only', 'Fold before', 'Fold after', 'Highlight only']
         self.assertEqual(FoldingTypes.all_values(), expected_values)
 
     def test_match(self):
@@ -34,7 +28,7 @@ class TestCommandFilter_File1(unittest.TestCase):
             self.assertEqual(FoldingTypes[key].value, val)
 
 
-class TestCommandFilter_File1(unittest.TestCase):
+class TestHighlightTypes(unittest.TestCase):
 
     def test_members(self):
         expected_members = ['outline', 'solid', 'underline_solid', 'underline_stippled', 'underline_squiggly', 'none']

@@ -78,8 +78,7 @@ class Expression:
                 escape=escape
             )
         else:
-            logger.error(f"Invalid data type: {type(data)}. Data must be a string, dictionary, or list")
-            raise ValueError(f"Invalid data type: {type(data)}. Data must be a string, dictionary, or list")
+            raise ValueError(f"Invalid data type of value: '{data}'. Data must be a string, dictionary, or list")
 
     def __repr__(self):
         return (f"Expression(name={self.name}, description={self.description}, "

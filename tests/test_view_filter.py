@@ -9,29 +9,28 @@ from unittest.mock import patch, MagicMock
 
 enums = sys.modules["File Filter.utils.enums"]
 view_utils = sys.modules["File Filter.utils.view"]
+SettingsSnapshot = sys.modules["File Filter.utils.settings_manager"].SettingsSnapshot
 
 FoldingTypes = enums.FoldingTypes
 HighlightTypes = enums.HighlightTypes
 
 class TestViewCommandFilter(TestCase):
 
-    @classmethod
-    def setUp(cls):
-        cls.window = sublime.active_window()
-        cls.view = cls.window.new_file()
-        cls.window.focus_view(cls.view)
+    def setUp(self):
+        self.window = sublime.active_window()
+        self.view = self.window.new_file()
+        self.window.focus_view(self.view)
 
-        cls.mock_logger = MagicMock()
+        self.mock_logger = MagicMock()
 
-        if not hasattr(cls, 'file') or not cls.file:
+        if not hasattr(self, 'file') or not self.file:
             raise ValueError("File content is not set")
 
-        cls.view.run_command("insert", {"characters": cls.file})
+        self.view.run_command("insert", {"characters": self.file})
 
-        cls.view_size = cls.view.size()
-        cls.view_lines = cls.view.lines(sublime.Region(0, cls.view_size))
+        self.view_size = self.view.size()
+        self.view_lines = self.view.lines(sublime.Region(0, self.view_size))
   
-    @classmethod
     def tearDown(self):
         if self.view:
             self.view.set_scratch(True)
@@ -40,7 +39,7 @@ class TestViewCommandFilter(TestCase):
         
     def run_filter(self, regex, folding_types, expected_values):
 
-        settings = sublime.Settings(0)
+        settings = SettingsSnapshot(sublime.load_settings("file_filter.sublime-settings"))
         view_utils.set_folding_type(self.mock_logger, self.view, settings, folding_types)
         self.assertEqual(view_utils.get_folding_type(self.mock_logger, self.view, settings), folding_types)
         
@@ -68,6 +67,40 @@ class TestViewFilterOnFile1(TestViewCommandFilter):
 
     def test_fold_after_only(self):
         self.run_filter(r"[0-9]", FoldingTypes.after_only, [(0, 3) , (6, 11), (14, 19), (24, 25)])
+
+    def test_no_matches_produces_no_fold_or_highlight_regions(self):
+        view_utils.filter(
+            self.mock_logger,
+            self.view,
+            "no-such-text",
+            FoldingTypes.line,
+            HighlightTypes.solid,
+        )
+
+        self.assertEqual(self.view.folded_regions(), [])
+        self.assertEqual(
+            self.view.get_regions(view_utils.VIEW_SETTINGS_HIGHLIGHTED_REGIONS),
+            [],
+        )
+        self.assertEqual(
+            self.view.settings().get(view_utils.VIEW_SETTINGS_CURRENT_REGEX),
+            "no-such-text",
+        )
+
+    def test_highlight_only_highlights_matches_without_folding(self):
+        view_utils.filter(
+            self.mock_logger,
+            self.view,
+            r"[0-9]",
+            FoldingTypes.highlight_only,
+            HighlightTypes.solid,
+        )
+
+        self.assertEqual(self.view.folded_regions(), [])
+        self.assertEqual(
+            self.view.get_regions(view_utils.VIEW_SETTINGS_HIGHLIGHTED_REGIONS),
+            self.view.find_all(r"[0-9]"),
+        )
 
 
 class TestViewFilterOnFile2(TestViewCommandFilter):
