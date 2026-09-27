@@ -1,6 +1,6 @@
 {
     "global":{
-        "log_level": 30,
+        "log_level": 10,
         "global_regex_flags": "gi",
     },
     "defaults":{
@@ -39,7 +39,7 @@
             "pattern": "\\[INF]",
         },
         {
-            "code": "",
+            "code": "start-with-date-time",
             "name": "Starting w/ Date Time",
             "pattern": "[0-9][0-9][0-9][0-9]\\-[0-9][0-9]\\-[0-9][0-9]\\ [0-9][0-9]\\:[0-9][0-9]\\:[0-9][0-9] \\[",
         }

@@ -14,21 +14,23 @@ class TestExpression(unittest.TestCase):
         self.assertEqual(expr.pattern, "regex")
         self.assertEqual(expr.type, "and")
         self.assertEqual(expr.name, "")
-        self.assertEqual(expr.description, "")
+        self.assertEqual(expr.code, "")
         self.assertEqual(expr.color, "white")
         self.assertFalse(expr.escape)
 
     def test_create_from_dict_simple(self):
         data = {
+            "code": "simple-pattern",
             "name": "Simple Pattern",
-            "description": "A simple regex pattern",
             "type": "and",
+            "color": "red",
             "pattern": "regex"
         }
         expr = Expression.new(data)
+        self.assertEqual(expr.code, "simple-pattern")
         self.assertEqual(expr.name, "Simple Pattern")
-        self.assertEqual(expr.description, "A simple regex pattern")
         self.assertEqual(expr.type, "and")
+        self.assertEqual(expr.color, "red")
         self.assertEqual(expr.pattern, "regex")
 
     def test_create_from_list(self):

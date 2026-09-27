@@ -1,20 +1,24 @@
 import logging
 
-from .settings_manager import SettingsManager
+# from .settings_manager import SETTINGS_FILE_NAME
+SETTINGS_FILE_NAME = 'file_filter.sublime-settings'
 from .utils import stringify
+
+import sublime # type: ignore
 
 TRACE = 5
 
+class CustomLogger(logging.Logger):
 
-class CustomLogger(logging.Logger, SettingsManager):
-
-    
     def __init__(self, name, level=logging.WARN):
         logging.Logger.__init__(self, name, level)
-        SettingsManager.__init__(self)
+
+        
+        self.settings = sublime.load_settings(SETTINGS_FILE_NAME)
+        self.settings.add_on_change('CustomLogger_' + self.name, self.reload_settings)
+        self.reload_settings()
 
         self.info(f"[File Filter][CustomLogger] init")
-        
         self.propagate = False
         
         if not self.handlers:
@@ -27,20 +31,20 @@ class CustomLogger(logging.Logger, SettingsManager):
             self.stream_handler.setFormatter(formatter)
             self.addHandler(self.stream_handler)
 
-        self.setLevel(self.settings.global_settings.log_level)
+        self.setLevel(level=level)
 
+    def __del__(self):
+        self.settings.settings_sublime.clear_on_change('CustomLogger_' + self.name)
+        
     def reload_settings(self):
-        super().reload_settings()
-        self.setLevel(self.settings.global_settings.log_level)
+        self.level = self.settings.get('global', {}).get('log_level', self.level)
+        self.setLevel(self.level)
 
-    def setLevel(self, level=logging.WARNING):
-        if hasattr(self, 'settings'):
-            level = self.settings.global_settings.log_level
+    def setLevel(self, level):
         super().setLevel(level)
-
         self.info(f"Setting log_level to '{level}'")
-                
-    
+
+
     def trace(self, *args, **kwargs):
         msg = stringify(*args, **kwargs)
         super().log(level=TRACE, msg=msg, stacklevel=2)

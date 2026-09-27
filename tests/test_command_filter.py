@@ -14,6 +14,7 @@ FavoritsInputHandler = File_Filter.FavoritsInputHandler
 FileFilterListener = File_Filter.FileFilterListener
 
 enums = sys.modules["File Filter.utils.enums"]
+Expression = sys.modules["File Filter.utils.expression"].Expression
 FoldingTypes = enums.FoldingTypes
 HighlightTypes = enums.HighlightTypes
 
@@ -77,12 +78,12 @@ class TestFileFilterOptionsInputHandler(unittest.TestCase):
 		favorites_handler = self.handler.next_input({"option": "favorites"})
 		self.assertIsInstance(favorites_handler, FavoritsInputHandler)
 		favorites_handler.settings.favorits = [
-			{"name": "Errors", "pattern": "ERROR"},
-			{"name": "Warnings", "pattern": "WARN"},
+			Expression.new("ERROR", code="errors", name="Errors"),
+			Expression.new("WARN", code="warnings", name="Warnings"),
 		]
 		self.assertEqual(
 			favorites_handler.list_items(),
-			[("Errors", "ERROR"), ("Warnings", "WARN")],
+			[("errors", "(ERROR)"), ("warnings", "(WARN)")],
 		)
 
 	@patch.object(view_utils, "filter")

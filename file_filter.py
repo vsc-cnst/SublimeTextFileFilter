@@ -1,4 +1,5 @@
 import logging
+from typing import NamedTuple
 import sublime_plugin # type: ignore
 import re
 
@@ -138,8 +139,14 @@ class HistoryInputHandler(commands_override.ListInputHandler):
     def cancel(self):
         pass
 
+class KeyValueTuple(NamedTuple):
+    key: str
+    value: str
+
 class FavoritsInputHandler(commands_override.ListInputHandler):
-    
+
+    _list_items = []
+
     def name(self):
         self.logger.debug("favorites")
         return "favorites"
@@ -147,12 +154,23 @@ class FavoritsInputHandler(commands_override.ListInputHandler):
     def list_items(self):
         favorits = self.settings.favorits
         self.logger.debug(favorits)
-        
-        favoritsExp = [Expression.new(f) for f in favorits]
+        self._list_items = [KeyValueTuple(exp.code, exp.compile()) for exp in favorits]
+        return self._list_items
 
-        self.logger.debug(favoritsExp)
-        return [(exp.name, exp.pattern) for exp in favoritsExp]
 
+    def preview(self, value):
+        self.logger.debug(value=value)
+
+        if len(value) == 0 :
+            return
+
+        return mini_html.create_preview(
+            None,
+            [
+                ("<i>Pattern</i>", value),
+            ]
+        )
+    
     def confirm(self, text):
         self.logger.info(text)
 

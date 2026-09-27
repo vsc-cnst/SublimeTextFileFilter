@@ -1,7 +1,7 @@
 import sublime # type: ignore
 
 def create_preview(
-    main: (str, str) = None,
+    main: tuple[str, str] = None,
     sub_items: list = []
 ):
     # Prepare content for the main item, if provided

@@ -4,10 +4,10 @@ import sublime # type: ignore
 import sublime_plugin # type: ignore
 
 from .custom_logger import CustomLogger # type: ignore
-from .settings_manager import SettingsManager
+from .settings_manager import SettingsClient
 
 
-class WindowCommand(sublime_plugin.WindowCommand, SettingsManager):
+class WindowCommand(sublime_plugin.WindowCommand, SettingsClient):
     
     def __init__(self, window):
         self.window = window
@@ -15,13 +15,10 @@ class WindowCommand(sublime_plugin.WindowCommand, SettingsManager):
         self.logger = logging.getLogger(f"{self.__class__.__name__}")
 
         sublime_plugin.WindowCommand.__init__(self, window)
-        SettingsManager.__init__(
-            self,
-            logger=self.logger
-        )
+        SettingsClient.__init__(self)
 
 
-class TextCommand(sublime_plugin.TextCommand, SettingsManager):
+class TextCommand(sublime_plugin.TextCommand, SettingsClient):
 
     def __init__(self, view):
         self.view = view
@@ -29,14 +26,11 @@ class TextCommand(sublime_plugin.TextCommand, SettingsManager):
         self.logger = logging.getLogger(f"{self.__class__.__name__}")
 
         sublime_plugin.TextCommand.__init__(self, view)
-        SettingsManager.__init__(
-            self,
-            logger=self.logger
-        )
+        SettingsClient.__init__(self)
 
 
 
-class ListInputHandler(sublime_plugin.ListInputHandler, SettingsManager):
+class ListInputHandler(sublime_plugin.ListInputHandler, SettingsClient):
 
     def __init__(self, view, logger:CustomLogger =None):
         self.view = view
@@ -45,12 +39,9 @@ class ListInputHandler(sublime_plugin.ListInputHandler, SettingsManager):
         self.logger = logging.getLogger(f"{logger_name}.{self.__class__.__name__}")
 
         sublime_plugin.ListInputHandler.__init__(self)
-        SettingsManager.__init__(
-            self,
-            logger=self.logger
-        )
+        SettingsClient.__init__(self)
 
-class TextInputHandler(sublime_plugin.TextInputHandler, SettingsManager):
+class TextInputHandler(sublime_plugin.TextInputHandler, SettingsClient):
 
     def __init__(self, view, logger=None):
         self.view = view
@@ -59,4 +50,4 @@ class TextInputHandler(sublime_plugin.TextInputHandler, SettingsManager):
         self.logger = logging.getLogger(f"{logger_name}.{self.__class__.__name__}")
         
         sublime_plugin.TextInputHandler.__init__(self)
-        SettingsManager.__init__(self, logger=self.logger)
+        SettingsClient.__init__(self)
