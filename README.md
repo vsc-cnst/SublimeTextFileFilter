@@ -5,7 +5,7 @@ File Filter highlights regex matches and folds non-matching content without modi
 
 It is useful when you want to quickly isolate relevant lines or sections in large log files, source code, or text dumps.
 
-![](media/v3/demo_v3.0.0.mp4)
+![](media/v3/file_filter.gif)
 
 ## Features
 
@@ -67,6 +67,8 @@ Same as `Clear Command`
 
 Adjust how content collapses around matches for better readability.
 
+![](media/v3/FileFilter_FoldingStyle.gif)
+
 1. Open `Command Palette`, 
 2. Select `File Filter: Folding Style` command.
 
@@ -81,6 +83,8 @@ Options:
 ### Set Highlight Style Command
 
 Adjust how matched text is highlighted.
+
+![](media/v3/FileFilter_HighlightTypes.gif)
 
 1. Open `Command Palette`, 
 2. Select `File Filter: Highlight Style`
