@@ -1,6 +1,6 @@
 {
     "global":{
-        "log_level": 10,
+        "log_level": 30,
         "global_regex_flags": "gi",
     },
     "defaults":{

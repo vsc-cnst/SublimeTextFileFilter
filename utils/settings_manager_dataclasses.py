@@ -23,8 +23,15 @@ class SettingsSnapshot:
         
         
         for fav in settings.get('favorits', []) :
-            if not isinstance(fav, dict) or not fav.get('code', []) or not fav.get('pattern', []):
-                logger.error("Could not load favorit. Must be a dictionary with properties 'code' and 'pattern'")
+            
+            if not isinstance(fav, dict):
+                logger.error("Could not load favorit. Must be a dictionary")
+                continue
+            elif not fav.get('code', []):
+                logger.error("Could not load favorit.code")
+                continue
+            elif not fav.get('pattern', []):
+                logger.error("Could not load favorit.pattern")
                 continue
 
             self.favorits.append( 
