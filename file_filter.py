@@ -3,12 +3,13 @@ from typing import NamedTuple
 import sublime_plugin # type: ignore
 import re
 
-from .utils.expression import Expression
+
 
 from .utils import commands_override
 
-from .utils.custom_logger import TRACE, CustomLogger
 from .utils.enums import FoldingTypes, HighlightTypes
+from .utils.key_value_tuple import KeyValueTuple
+from .utils.custom_logger import TRACE, CustomLogger
 from .utils.view  import VIEW_SETTINGS_CURRENT_REGEX, VIEW_SETTINGS_REGEX_HISTORY, VIEW_SETTINGS_IS_FILTER_ACTIVE
 from .utils import view as view_utils
 from .utils import mini_html
@@ -139,9 +140,6 @@ class HistoryInputHandler(commands_override.ListInputHandler):
     def cancel(self):
         pass
 
-class KeyValueTuple(NamedTuple):
-    key: str
-    value: str
 
 class FavoritsInputHandler(commands_override.ListInputHandler):
 
