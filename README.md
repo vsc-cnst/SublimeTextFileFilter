@@ -10,11 +10,25 @@ It is useful when you want to quickly isolate relevant lines or sections in larg
 ## Features
 
 - Regex-based filtering
-- Create filter based on text selection
+- Create a filter from selected text
 - Highlight styles for matches
 - Folding strategies for non-matching content
-- Favorite / preset filters
+- Favorite presets
 - History
+
+## Table of contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Commands](#commands)
+    - [File Filter Command](#file-filter-command)
+    - [Set Folding Style Command](#set-folding-style-command)
+    - [Set Highlight Style Command](#set-highlight-style-command)
+    - [Clear Command](#clear-command)
+    - [Edit Settings Command](#edit-settings-command)
+- [Regex syntax](#regex-syntax)
+- [Settings](#settings)
+
 
 ## Installation
 
@@ -27,41 +41,17 @@ It is useful when you want to quickly isolate relevant lines or sections in larg
 
 ### File Filter Command
 
-1. Open `Command Palette`, 
-2. Select `File Filter` command
-3. Select one of the options:
-    - New
-    - From Selected Text
-    - History
-    - Favorites
-    - Clear
+1. Open the Command Palette.
+2. Select `File Filter`.
+3. Choose one of the available options:
 
-
-> #### - Option: **`New`**
-
-Opens a regex prompt to create a new search pattern.
-
-
-> #### - Option: **`From Selected Text`**
-
-Uses the current selection as the search pattern.
-
-
-> #### - Option: **`History`**
-
-Restores a previously used regex from the current view history and applies it immediately.
-
-
-> #### - Option: **`Favorites`**
-
-Applies a saved preset from the `favorits` list to the current view.
-
-
-
-> #### - Option: `Clear`
-
-Same as `Clear Command`
-
+| Option | Description |
+| :--- | :--- |
+| New | Opens a regex prompt to create a new search pattern. |
+| From Selected Text | Uses the current selection as the search pattern. |
+| History | Restores a previously used regex from the current view history and applies it immediately. |
+| Favorites | Applies a saved preset from the `favorits` list to the current view. |
+| Clear | Clears the current filter, equivalent to the Clear command. |
 
 ### Set Folding Style Command
 
@@ -69,16 +59,15 @@ Adjust how content collapses around matches for better readability.
 
 ![](media/v3/FileFilter_FoldingStyle.gif)
 
-1. Open `Command Palette`, 
-2. Select `File Filter: Folding Style` command.
+1. Open the Command Palette.
+2. Select `File Filter: Folding Style`.
 
 Options:
-  - `line`: Show the entire line, but hide lines with no matches.
+  - `line`: Show the entire line while hiding lines with no matches.
   - `match_only`: Show only the matched text.
-  - `before_only`: Fold all text before the match. Shows only lines with matches.
-  - `after_only`: Fold text after the match. Hides lines with no matches.
-  - `highlight_only`: Highlight the matched text without folding or hiding lines.
-
+  - `before_only`: Fold all text before the match and show only the matching lines.
+  - `after_only`: Fold text after the match and hide lines with no matches.
+  - `highlight_only`: Highlight the matched text without folding or hiding any content.
 
 ### Set Highlight Style Command
 
@@ -86,32 +75,30 @@ Adjust how matched text is highlighted.
 
 ![](media/v3/FileFilter_HighlightTypes.gif)
 
-1. Open `Command Palette`, 
-2. Select `File Filter: Highlight Style`
+1. Open the Command Palette.
+2. Select `File Filter: Highlight Style`.
 
 Options:
   - `solid`: Highlight with a solid fill.
-  - `outline`: Highlight with an outline, no fill.
-  - `underline_solid`: Highlight with a solid underline, no fill or outline.
-  - `underline_stippled`: Highlight with a stippled underline, no fill or outline.
-  - `underline_squiggly`: Highlight with a squiggly underline, no fill or outline.
-  - `none`: No highlighting.
-
+  - `outline`: Highlight with an outline and no fill.
+  - `underline_solid`: Highlight with a solid underline and no fill or outline.
+  - `underline_stippled`: Highlight with a stippled underline and no fill or outline.
+  - `underline_squiggly`: Highlight with a squiggly underline and no fill or outline.
+  - `none`: Disable highlighting.
 
 ### Clear Command
 
-Clear all filters.
+Clear all active filters.
 
-1. Open `Command Palette`, 
-2. Select `File Filter: Clear`
-
+1. Open the Command Palette.
+2. Select `File Filter: Clear`.
 
 ### Edit Settings Command
 
-Opens `user settings` files.
+Open the plugin settings file.
 
-1. Open `Command Palette`, 
-2. Select `File Filter: Edit Settings` 
+1. Open the Command Palette.
+2. Select `File Filter: Edit Settings`.
 
 
 ## Regex syntax
@@ -131,50 +118,50 @@ For additional information on valid syntax and options, follow the [Python regex
 
 ## Settings
 
-```json
+```js
 {
-    "global":{
+    "global": {
         // minimum log level
-        "log_level": 30, 
+        "log_level": 30,
 
         // default global regex
-        "global_regex_flags": "gi", 
+        "global_regex_flags": "gi"
     },
-    "defaults":{
-        // default highlight settings 
-        "highlight":{
-            "type": "solid", // 'solid', 'outline', 'underline_solid', 'underline_stippled', 'underline_squiggly', 'none'
+    "defaults": {
+        // default highlight settings
+        "highlight": {
+            "type": "solid" // 'solid', 'outline', 'underline_solid', 'underline_stippled', 'underline_squiggly', 'none'
         },
-        // default folding settings 
+        // default folding settings
         "folding": {
-            "type": "line", // 'line', 'match_only', 'before_only', 'after_only', 'highlight_only'
-        },
-    },  
-    "commands":{
-        "new":{
+            "type": "line" // 'line', 'match_only', 'before_only', 'after_only', 'highlight_only'
+        }
+    },
+    "commands": {
+        "new": {
             // filter every time the prompt changes
             "filter_on_change": true,
             "show_total_matches": true
         },
-        "from_selection":{
-            // escape selected text to create the regex 
+        "from_selection": {
+            // escape selected text to create the regex
             "escape_selection": true
         },
-        "clear":{
+        "clear": {
+            // keep the current setting name exactly as used by the plugin
             "center_viewport_on_carret": true,
             "remove_highlights": true,
             "unfold_regions": true
-        },
+        }
     },
-    // list shown in favorits command
+    // list shown in the favorites command
     "favorits": [
-        {   
+        {
             // avoid repeated codes
             "code": "logs-info",
             "name": "logs info",
-            "pattern": "\\[INF]",
-        },
-
-    ],
+            "pattern": "\\[INF]"
+        }
+    ]
 }
 ```
