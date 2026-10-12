@@ -88,7 +88,7 @@ class OptionsInputHandler(commands_override.ListInputHandler):
             text = self.view.substr(self.view.sel()[0])
             return RegexInputHandler(self.view, self.logger, re.escape(text or "") if escape else text)
         if selected_option == "favorites":
-            return FavoritsInputHandler(self.view, self.logger)
+            return FavoritesInputHandler(self.view, self.logger)
         if selected_option == "clear":
             clear_settings = self.settings.commands.clear
             view_utils.clear(
@@ -141,7 +141,7 @@ class HistoryInputHandler(commands_override.ListInputHandler):
         pass
 
 
-class FavoritsInputHandler(commands_override.ListInputHandler):
+class FavoritesInputHandler(commands_override.ListInputHandler):
 
     _list_items = []
 
@@ -150,9 +150,9 @@ class FavoritsInputHandler(commands_override.ListInputHandler):
         return "favorites"
 
     def list_items(self):
-        favorits = self.settings.favorits
-        self.logger.debug(favorits)
-        self._list_items = [KeyValueTuple(exp.code, exp.compile()) for exp in favorits]
+        favorites = self.settings.favorites
+        self.logger.debug(favorites)
+        self._list_items = [KeyValueTuple(exp.code, exp.compile()) for exp in favorites]
         return self._list_items
 
 

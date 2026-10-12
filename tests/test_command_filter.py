@@ -10,7 +10,7 @@ FileFilterCommand = File_Filter.FileFilterCommand
 OptionsInputHandler = File_Filter.OptionsInputHandler
 RegexInputHandler = File_Filter.RegexInputHandler
 HistoryInputHandler = File_Filter.HistoryInputHandler
-FavoritsInputHandler = File_Filter.FavoritsInputHandler
+FavoritesInputHandler = File_Filter.FavoritesInputHandler
 FileFilterListener = File_Filter.FileFilterListener
 
 enums = sys.modules["File Filter.utils.enums"]
@@ -76,8 +76,8 @@ class TestFileFilterOptionsInputHandler(unittest.TestCase):
 
 	def test_favorites_routes_to_favorites_handler(self):
 		favorites_handler = self.handler.next_input({"option": "favorites"})
-		self.assertIsInstance(favorites_handler, FavoritsInputHandler)
-		favorites_handler.settings.favorits = [
+		self.assertIsInstance(favorites_handler, FavoritesInputHandler)
+		favorites_handler.settings.favorites = [
 			Expression.new("ERROR", code="errors", name="Errors"),
 			Expression.new("WARN", code="warnings", name="Warnings"),
 		]

@@ -28,7 +28,7 @@ SETTING-BY-SETTING MAPPING (source setting goes to target path):
     "on_clear_command_options.center_viewport_on_carret":       ==>     "commands.clear.center_viewport_on_carret",
     "on_clear_command_options.remove_highlights":               ==>     "commands.clear.remove_highlights",
     "on_clear_command_options.unfold_regions":                  ==>     "commands.clear.unfold_regions",
-    "regex_list"                                                ==>     "favorits"
+    "regex_list"                                                ==>     "favorites"
 
 For any doubts or issues, please open an issue in the repo at
 https://github.com/vsc-cnst/SublimeTextFileFilter/issues

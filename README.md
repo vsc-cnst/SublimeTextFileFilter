@@ -50,7 +50,7 @@ It is useful when you want to quickly isolate relevant lines or sections in larg
 | New | Opens a regex prompt to create a new search pattern. |
 | From Selected Text | Uses the current selection as the search pattern. |
 | History | Restores a previously used regex from the current view history and applies it immediately. |
-| Favorites | Applies a saved preset from the `favorits` list to the current view. |
+| Favorites | Applies a saved preset from the `favorites` list to the current view. |
 | Clear | Clears the current filter, equivalent to the Clear command. |
 
 ### Set Folding Style Command
@@ -155,7 +155,7 @@ For additional information on valid syntax and options, follow the [Python regex
         }
     },
     // list shown in the favorites command
-    "favorits": [
+    "favorites": [
         {
             // avoid repeated codes
             "code": "logs-info",

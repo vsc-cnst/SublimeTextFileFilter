@@ -96,7 +96,7 @@ class TestSettingsManager(unittest.TestCase):
         self.assertFalse(snapshot.commands.clear.center_viewport_on_carret)
         self.assertTrue(snapshot.commands.clear.unfold_regions)
         self.assertFalse(snapshot.commands.clear.remove_highlights)
-        self.assertEqual(snapshot.favorits, [])
+        self.assertEqual(snapshot.favorites, [])
         self.assertEqual(snapshot.expressions, [])
         self.assertIn('expressions=[]', repr(snapshot))
 
@@ -116,7 +116,7 @@ class TestSettingsManager(unittest.TestCase):
                     'unfold_regions': False,
                 },
             },
-            'favorits': [{
+            'favorites': [{
                 'code': 'errors',
                 'name': 'Errors',
                 'pattern': 'ERROR',
@@ -141,8 +141,8 @@ class TestSettingsManager(unittest.TestCase):
         self.assertTrue(snapshot.commands.clear.center_viewport_on_carret)
         self.assertTrue(snapshot.commands.clear.remove_highlights)
         self.assertFalse(snapshot.commands.clear.unfold_regions)
-        self.assertEqual(len(snapshot.favorits), 1)
-        favorit = snapshot.favorits[0]
+        self.assertEqual(len(snapshot.favorites), 1)
+        favorit = snapshot.favorites[0]
         self.assertEqual(favorit.code, 'errors')
         self.assertEqual(favorit.name, 'Errors')
         self.assertEqual(favorit.pattern, 'ERROR')
@@ -152,7 +152,7 @@ class TestSettingsManager(unittest.TestCase):
 
     def test_snapshot_skips_malformed_favorites(self):
         values = {
-            'favorits': [
+            'favorites': [
                 'not a dictionary',
                 {'code': 'missing-pattern'},
                 {'pattern': 'missing-code'},
@@ -165,6 +165,6 @@ class TestSettingsManager(unittest.TestCase):
 
         snapshot = SettingsSnapshot(settings, logger=logger)
 
-        self.assertEqual(len(snapshot.favorits), 1)
-        self.assertEqual(snapshot.favorits[0].code, 'valid')
+        self.assertEqual(len(snapshot.favorites), 1)
+        self.assertEqual(snapshot.favorites[0].code, 'valid')
         self.assertEqual(logger.error.call_count, 3)

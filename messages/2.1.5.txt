@@ -21,7 +21,7 @@ SETTING-BY-SETTING MAPPING (source setting goes to target path):
     "on_clear_command_options.remove_highlights": goes to "commands.clear.remove_highlights",
     "on_clear_command_options.unfold_regions": goes to "commands.clear.unfold_regions",
 
-    "regex_list" is now "favorits" 
+    "regex_list" is now "favorites" 
 
 
 For any doubt or issue please open an issue in the repo at

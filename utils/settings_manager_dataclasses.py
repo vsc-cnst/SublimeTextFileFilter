@@ -10,7 +10,7 @@ class SettingsSnapshot:
     global_settings: GlobalSettings
     defaults: DefaultsSettings 
     commands: CommandsSettings
-    favorits: list[Expression]
+    favorites: list[Expression]
     expressions: list[Expression]
 
     def __init__(self, settings: sublime.Settings, logger=None):
@@ -18,11 +18,11 @@ class SettingsSnapshot:
         self.defaults = DefaultsSettings(settings.get('defaults', {}))
         self.commands = CommandsSettings(settings.get('commands', {}))
 
-        self.favorits = []
+        self.favorites = []
         self.expressions = []
         
         
-        for fav in settings.get('favorits', []) :
+        for fav in settings.get('favorites', []) :
             
             if not isinstance(fav, dict):
                 logger.error("Could not load favorit. Must be a dictionary")
@@ -34,7 +34,7 @@ class SettingsSnapshot:
                 logger.error("Could not load favorit.pattern")
                 continue
 
-            self.favorits.append( 
+            self.favorites.append( 
                 Expression.new(
                     data=fav.get('pattern'),
                     code=fav.get('code'),
@@ -94,14 +94,14 @@ class CommandsSettings:
     from_selection: FromSelectionSettings
     clear: ClearCommandSettings
     history: HistoryCommandSettings
-    favorites: FavoritsCommandSettings
+    favorites: FavoritesCommandSettings
 
     def __init__(self, settings:dict):
         self.new = NewCommandSettings(settings.get('new', {}))
         self.from_selection = FromSelectionSettings(settings.get('from_selection', {}))
         self.clear = ClearCommandSettings(settings.get('clear', {}))
         self.history = HistoryCommandSettings(settings.get('history', {}))
-        self.favorites = FavoritsCommandSettings(settings.get('favorites', {}))
+        self.favorites = FavoritesCommandSettings(settings.get('favorites', {}))
 
 @dataclass
 class NewCommandSettings:
@@ -142,7 +142,7 @@ class HistoryCommandSettings:
 
     
 @dataclass
-class FavoritsCommandSettings:
+class FavoritesCommandSettings:
 
     def __init__(self, settings: dict):
         pass

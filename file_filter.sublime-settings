@@ -32,7 +32,7 @@
             "unfold_regions": true
         },
     },
-    "favorits": [
+    "favorites": [
         {   
             "code": "logs-info",
             "name": "logs info",
